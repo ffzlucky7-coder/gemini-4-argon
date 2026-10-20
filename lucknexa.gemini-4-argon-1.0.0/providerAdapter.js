@@ -98,7 +98,10 @@ class ProviderAdapter {
   // 1. GOOGLE VERTEX AI (GEMINI 4 ARGON)
   // ==========================================================================
   async executeVertexTurn({ history, systemInstruction, thinkingLevel, attachments, signal, onEvent }) {
-    const projectId = this.config.projectId || 'planar-hangout-510114-u1';
+    const projectId = this.config.projectId || process.env.GEMINI_PROJECT_ID || process.env.GCP_PROJECT_ID || '';
+    if (!projectId) {
+      throw new Error('Google Cloud Project ID is required. Please set your Project ID in ⚙️ Settings or set GEMINI_PROJECT_ID.');
+    }
     const location = this.config.location || 'global';
     const level = (thinkingLevel || this.config.thinkingLevel || 'high').toLowerCase();
 

@@ -12,7 +12,7 @@
 [![Design](https://img.shields.io/badge/UI-Apple--Grade%20Glass-818cf8.svg)](#)
 [![License](https://img.shields.io/badge/License-MIT-34d399.svg)](LICENSE)
 
-> Developed by **Lucky Kuntal**, **Gemini 4 Argon** is a frontier autonomous software engineering agent that runs natively inside **Antigravity IDE**, **VS Code**, **Claude Desktop**, and **Codex**. It features native multimodal attachments, deep reasoning budgets, autonomous workspace modification tools with automatic backups, and seamless multi-model support across **Gemini 4 Argon**, **Claude Opus 5.5**, and **GPT-6 Astra**.
+> Developed by **Lucky Kuntal**, **Gemini 4 Argon** is a frontier autonomous software engineering agent that runs natively inside **Antigravity IDE**, **VS Code**, **Claude Desktop**, and **Codex / Cursor**. It features native multimodal attachments, deep reasoning budgets, autonomous workspace modification tools with automatic backups, and seamless multi-model support across **Gemini 4 Argon**, **Claude Opus 5.5**, and **GPT-6 Astra**.
 
 ---
 
@@ -24,7 +24,7 @@
   - Real-time glass preview chips with file size badges and one-click removal.
 - 🔌 **Claude Desktop & Codex Native MCP Server (`mcp/server.js`)**:
   - Full **Model Context Protocol (JSON-RPC 2.0)** server running over standard I/O (`stdio`).
-  - Seamlessly gives **Claude Desktop**, **Claude Code**, **Cursor**, and **Codex** full autonomous access to all 7 workspace tools plus `gemini_4_argon_reason`.
+  - Gives **Claude Desktop**, **Claude Code**, **Cursor**, and **Codex** full autonomous access to all 7 workspace tools plus `gemini_4_argon_reason`.
 - 🧠 **Multi-Model Provider Adapter**:
   - **Google Vertex AI (Default)**: Flagship `gemini-4-argon` with free trial credits.
   - **Anthropic Claude 5.x Tier**: `claude-opus-5.5` (Deep Reasoning Flagship), `claude-sonnet-5.5` (Coding Workhorse), `claude-fable-5.1` (Mythos Class Frontier), and `claude-haiku-5.5` (Fast Everyday).
@@ -36,7 +36,128 @@
 
 ---
 
-## 🤖 Full Autonomous Workspace Tools
+## 🏛️ System & MCP Architecture
+
+```mermaid
+flowchart TD
+    subgraph IDE_Extension ["Antigravity IDE / VS Code Extension"]
+        Webview["Apple-Grade Glassmorphic UI\n(Media Attachments + Dynamic Reasoning)"]
+        AgentLoop["Autonomous ReAct Loop\n(agentLoop.js)"]
+        Provider["Multi-Model Adapter\n(Vertex AI | Claude 5.x | GPT-6)"]
+        Webview <--> AgentLoop
+        AgentLoop <--> Provider
+    end
+
+    subgraph MCP_Layer ["Model Context Protocol (MCP) Server"]
+        MCPEngine["Standalone JSON-RPC 2.0 Engine\n(mcp/server.js)"]
+        WorkspaceTools["7 Autonomous Workspace Tools\n(read, write, edit, list, tree, search, run)"]
+        ArgonTool["gemini_4_argon_reason\n(Direct Frontier Reasoning)"]
+        MCPEngine <--> WorkspaceTools
+        MCPEngine <--> ArgonTool
+    end
+
+    subgraph External_Clients ["External AI Workspaces"]
+        ClaudeDesk["Claude Desktop / Claude Code"]
+        CodexCursor["OpenAI Codex / Cursor IDE"]
+        ClaudeDesk <== "stdio (MCP)" ==> MCPEngine
+        CodexCursor <== "stdio (MCP)" ==> MCPEngine
+    end
+
+    subgraph Cloud_AI ["Cloud Intelligence Providers"]
+        VertexCloud["Google Vertex AI\n(gemini-4-argon)"]
+        AnthropicCloud["Anthropic API\n(claude-opus-5.5)"]
+        OpenAICloud["OpenAI API\n(gpt-6-astra)"]
+        Provider <--> VertexCloud
+        Provider <--> AnthropicCloud
+        Provider <--> OpenAICloud
+        ArgonTool <--> VertexCloud
+    end
+```
+
+---
+
+## 🖥️ Complete Setup Guide: Claude Desktop
+
+You can connect **Claude Desktop** directly to your local **Gemini 4 Argon MCP Server** so Claude gains full access to all 7 workspace tools and can consult Gemini 4 Argon for deep reasoning!
+
+### Step 1: Locate your Claude Desktop Config File
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`  
+  *(Shortcut: Press `Win + R`, paste `%APPDATA%\Claude`, and press Enter)*
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Linux**: `~/.config/Claude/claude_desktop_config.json`
+
+### Step 2: Add the Gemini 4 Argon MCP Server
+Open or create `claude_desktop_config.json` in any text editor, and add:
+
+```json
+{
+  "mcpServers": {
+    "gemini-4-argon": {
+      "command": "node",
+      "args": [
+        "<ABSOLUTE_PATH_TO_GEMINI_4_ARGON>/mcp/server.js"
+      ],
+      "env": {
+        "GEMINI_PROJECT_ID": "<YOUR_GOOGLE_CLOUD_PROJECT_ID>",
+        "GEMINI_LOCATION": "global",
+        "GEMINI_AUTH_METHOD": "adc"
+      }
+    }
+  }
+}
+```
+
+> **💡 Example Path**:
+> - If you cloned this repository into `C:\projects\gemini-4-argon`, set `args` to:
+>   `"args": ["C:/projects/gemini-4-argon/mcp/server.js"]` (use forward slashes `/`).
+> - Replace `<YOUR_GOOGLE_CLOUD_PROJECT_ID>` with your own Google Cloud Project ID.
+
+### Step 3: Restart Claude Desktop
+Close Claude Desktop completely and reopen it. You will see a small **Hammer (`🛠️`) icon** at the bottom right indicating 8 tools are active:
+- `gemini_4_argon_reason`
+- `read_file`, `write_file`, `edit_file`
+- `list_dir`, `get_workspace_structure`
+- `search_code`, `run_command`
+
+---
+
+## 💻 Complete Setup Guide: OpenAI Codex / Cursor / Windsurf
+
+You can use the exact same MCP Server in **Cursor**, **Windsurf**, or any **Codex MCP Client**:
+
+### In Cursor / Windsurf IDE:
+1. Open **Cursor Settings** (`Ctrl + ,` or `Cmd + ,`).
+2. Navigate to **Features** -> **MCP**.
+3. Click **+ Add New MCP Server**.
+4. Enter:
+   - **Name**: `gemini-4-argon`
+   - **Type**: `command`
+   - **Command**: `node <ABSOLUTE_PATH_TO_GEMINI_4_ARGON>/mcp/server.js`
+5. Alternatively, create or edit `.cursor/mcp.json` in your project root:
+
+```json
+{
+  "mcpServers": {
+    "gemini-4-argon": {
+      "command": "node",
+      "args": [
+        "<ABSOLUTE_PATH_TO_GEMINI_4_ARGON>/mcp/server.js"
+      ],
+      "env": {
+        "GEMINI_PROJECT_ID": "<YOUR_GOOGLE_CLOUD_PROJECT_ID>",
+        "GEMINI_LOCATION": "global",
+        "GEMINI_AUTH_METHOD": "adc"
+      }
+    }
+  }
+}
+```
+
+Now Cursor's Agent or Codex can autonomously inspect, write, refactor, and test your codebase!
+
+---
+
+## 🤖 Full Autonomous Workspace Tools Reference
 
 The agent has complete autonomous access to your project workspace through 7 non-destructive tools:
 
@@ -51,44 +172,6 @@ The agent has complete autonomous access to your project workspace through 7 non
 | `run_command` | Executes terminal commands: unit tests (`pytest`, `npm test`), linters, builds, and git operations. |
 
 🛡️ **Zero-Loss Safety Net**: The extension automatically creates a `.argon_bak` backup before modifying or overwriting any existing file.
-
----
-
-## 🖥️ Claude Desktop & Codex MCP Integration
-
-You can use the **Gemini 4 Argon MCP Server** directly in **Claude Desktop**, **Claude Code**, or **Codex** to let Claude consult Gemini 4 Argon or run workspace tools autonomously!
-
-### 1. Claude Desktop Setup
-Open your Claude Desktop configuration file:
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-
-Add the `gemini-4-argon` MCP server configuration:
-
-```json
-{
-  "mcpServers": {
-    "gemini-4-argon": {
-      "command": "node",
-      "args": [
-        "D:/ALL CAREER COURSE/LuckNexa/Gemini 4 Argon/lucknexa.gemini-4-argon-1.0.0/mcp/server.js"
-      ],
-      "env": {
-        "GEMINI_PROJECT_ID": "planar-hangout-510114-u1",
-        "GEMINI_LOCATION": "global",
-        "GEMINI_AUTH_METHOD": "adc"
-      }
-    }
-  }
-}
-```
-
-> **Note**: Adjust the path in `args` to match the exact location of `mcp/server.js` on your machine.
-
-### 2. Available MCP Tools in Claude / Codex
-Once configured, Claude or Codex can invoke:
-- `gemini_4_argon_reason`: Consult Google's flagship Gemini 4 Argon reasoning model for deep architectural analysis and complex debugging.
-- `read_file`, `write_file`, `edit_file`, `list_dir`, `get_workspace_structure`, `search_code`, `run_command`: Directly inspect, edit, and test your codebase!
 
 ---
 
@@ -110,10 +193,10 @@ Google Cloud offers **$300 USD (approx. ₹26,000 INR)** in 100% free credits fo
 
 ---
 
-## ⚡ Google Cloud Setup: What You Need
+## ⚡ Google Cloud Setup: What Every User Needs
 
-To run Gemini 4 Argon, you only need **two things**:
-1. Your **Google Cloud Project ID**
+To run Gemini 4 Argon with your own Google Cloud account, you only need **two things**:
+1. Your own **Google Cloud Project ID**
 2. **Vertex AI API Enabled** + **One Credentials Method** (ADC, Service Account JSON, or API Key)
 
 ### Step 1: Enable Vertex AI API
@@ -123,7 +206,7 @@ To run Gemini 4 Argon, you only need **two things**:
 
 ### Step 2: Copy Your Project ID
 1. In the Google Cloud Console top navigation bar, click on the project dropdown (next to "Google Cloud").
-2. Copy your **Project ID** (e.g. `planar-hangout-510114-u1`). Paste this into the extension settings.
+2. Copy your **Project ID** (e.g. `your-project-id-here`). Paste this into the extension settings.
 
 ---
 

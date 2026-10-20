@@ -27,7 +27,7 @@ const SERVER_VERSION = '1.1.0';
 
 // Default configuration from environment or ADC
 const config = {
-  projectId: process.env.GEMINI_PROJECT_ID || process.env.GCP_PROJECT_ID || 'planar-hangout-510114-u1',
+  projectId: process.env.GEMINI_PROJECT_ID || process.env.GCP_PROJECT_ID || '',
   location: process.env.GEMINI_LOCATION || 'global',
   authMethod: process.env.GEMINI_AUTH_METHOD || 'adc',
   serviceAccountKeyPath: process.env.GEMINI_SA_KEY_PATH || '',

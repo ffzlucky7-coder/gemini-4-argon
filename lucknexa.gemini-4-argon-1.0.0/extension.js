@@ -25,7 +25,7 @@ let currentAgent = null;
 function getExtensionConfig() {
   const cfg = vscode.workspace.getConfiguration('gemini4Argon');
   return {
-    projectId: cfg.get('projectId') || 'planar-hangout-510114-u1',
+    projectId: cfg.get('projectId') || process.env.GEMINI_PROJECT_ID || '',
     location: cfg.get('location') || 'global',
     thinkingLevel: cfg.get('thinkingLevel') || 'high',
     authMethod: cfg.get('authMethod') || 'adc',
@@ -129,7 +129,10 @@ async function testConnectionMulti(config) {
     const startTime = Date.now();
     try {
       const headers = await getAuthHeaders(config);
-      const projectId = config.projectId || 'planar-hangout-510114-u1';
+      const projectId = config.projectId || process.env.GEMINI_PROJECT_ID || '';
+    if (!projectId) {
+      return { success: false, message: 'Google Cloud Project ID is not configured. Please enter your Project ID in Settings (⚙️).' };
+    }
       const location = config.location || 'global';
       const url = `https://aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/gemini-4-argon:generateContent`;
       const resp = await fetch(url, {

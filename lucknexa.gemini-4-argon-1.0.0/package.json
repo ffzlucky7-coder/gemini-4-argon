@@ -116,7 +116,7 @@
         },
         "gemini4Argon.projectId": {
           "type": "string",
-          "default": "planar-hangout-510114-u1",
+          "default": "",
           "description": "Google Cloud Project ID with Vertex AI enabled."
         },
         "gemini4Argon.location": {

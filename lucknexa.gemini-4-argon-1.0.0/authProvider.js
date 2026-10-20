@@ -192,7 +192,10 @@ async function getAuthHeaders(config) {
 
 async function testConnection(config) {
   const startTime = Date.now();
-  const projectId = config.projectId || 'planar-hangout-510114-u1';
+  const projectId = config.projectId || process.env.GEMINI_PROJECT_ID || process.env.GCP_PROJECT_ID || '';
+  if (!projectId) {
+    return { success: false, message: 'Google Cloud Project ID is not configured. Please enter your Project ID in Settings (⚙️).' };
+  }
   const location = config.location || 'global';
 
   try {
