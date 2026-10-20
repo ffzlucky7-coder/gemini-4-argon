@@ -1,0 +1,6 @@
+# Node & VS Code
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+*.argon_bak

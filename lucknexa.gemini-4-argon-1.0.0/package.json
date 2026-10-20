@@ -1,0 +1,134 @@
+{
+  "name": "gemini-4-argon",
+  "displayName": "Gemini 4 Argon Autonomous Agent",
+  "description": "Google Flagship Gemini 4 Argon Autonomous Coding & Auditing Agent with full workspace, file, and terminal execution powers.",
+  "version": "1.0.0",
+  "icon": "media/icon.png",
+  "publisher": "ffzlucky7-coder",
+  "author": "Lucky Kuntal (https://github.com/ffzlucky7-coder)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ffzlucky7-coder/gemini-4-argon"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "AI",
+    "Programming Languages",
+    "Linters"
+  ],
+  "keywords": [
+    "gemini",
+    "gemini-4-argon",
+    "argon",
+    "agent",
+    "vertex-ai",
+    "ai"
+  ],
+  "activationEvents": [
+    "*",
+    "onStartupFinished",
+    "onView:gemini-4-argon.chatView",
+    "onCommand:gemini-4-argon.openChat"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "gemini-4-argon-container",
+          "title": "Gemini 4 Argon",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "gemini-4-argon-container": [
+        {
+          "type": "webview",
+          "id": "gemini-4-argon.chatView",
+          "name": "Gemini 4 Argon Agent"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "gemini-4-argon.openChat",
+        "title": "Open Gemini 4 Argon Agent",
+        "category": "Gemini 4 Argon"
+      },
+      {
+        "command": "gemini-4-argon.auditWorkspace",
+        "title": "Audit Full Workspace with Gemini 4 Argon",
+        "category": "Gemini 4 Argon"
+      },
+      {
+        "command": "gemini-4-argon.auditCurrentFile",
+        "title": "Audit Current File with Gemini 4 Argon",
+        "category": "Gemini 4 Argon"
+      },
+      {
+        "command": "gemini-4-argon.configureCredentials",
+        "title": "Configure Google Cloud Settings",
+        "category": "Gemini 4 Argon"
+      },
+      {
+        "command": "gemini-4-argon.openGuide",
+        "title": "Open Setup & Free Credits Guide",
+        "category": "Gemini 4 Argon"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "gemini-4-argon.auditCurrentFile",
+          "group": "Gemini4Argon@1"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "gemini-4-argon.auditWorkspace",
+          "group": "Gemini4Argon@1"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Gemini 4 Argon Agent",
+      "properties": {
+        "gemini4Argon.projectId": {
+          "type": "string",
+          "default": "planar-hangout-510114-u1",
+          "description": "Google Cloud Project ID with Vertex AI enabled."
+        },
+        "gemini4Argon.location": {
+          "type": "string",
+          "default": "global",
+          "description": "Vertex AI location/region (global is required for Gemini 4 Argon)."
+        },
+        "gemini4Argon.thinkingLevel": {
+          "type": "string",
+          "enum": ["low", "medium", "high"],
+          "default": "high",
+          "description": "Thinking reasoning budget level (Low: fast/eco, Medium: balanced, High: deep reasoning & full AAA coding)."
+        },
+        "gemini4Argon.authMethod": {
+          "type": "string",
+          "enum": ["adc", "serviceAccount", "apiKey"],
+          "default": "adc",
+          "description": "Authentication method to access Google Cloud Vertex AI."
+        },
+        "gemini4Argon.serviceAccountKeyPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to Google Cloud Service Account JSON key file (for Service Account auth)."
+        },
+        "gemini4Argon.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Google Cloud Vertex AI API Key (for API Key auth)."
+        }
+      }
+    }
+  }
+}

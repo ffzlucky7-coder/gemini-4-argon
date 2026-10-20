@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemini 4 Argon Agent</title>
+  <link rel="stylesheet" href="{{styleUri}}">
+</head>
+<body>
+  <div class="agent-shell">
+    <!-- 1. Apple-Grade Frosted Glass Header -->
+    <header class="glass-header" role="banner">
+      <div class="brand">
+        <div class="brand-avatar-wrapper" aria-hidden="true">
+          <img src="{{iconUri}}" alt="" class="brand-icon" />
+          <div class="avatar-glow"></div>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title-row">
+            <span class="brand-title">Gemini 4 Argon</span>
+            <span class="brand-badge">Vertex AI</span>
+          </div>
+          <span class="brand-author">by Lucky Kuntal</span>
+        </div>
+      </div>
+      <div class="header-actions" role="toolbar" aria-label="Extension actions">
+        <button id="themeToggleBtn" title="Toggle Theme (Dark / Light)" aria-label="Toggle Dark or Light theme" class="glass-icon-btn">
+          <svg id="themeIconDark" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg id="themeIconLight" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+        <button id="historyToggleBtn" title="Saved Conversations" aria-label="Open conversation history" class="glass-icon-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span id="historyCountBadge" class="action-badge" style="display: none;">0</span>
+        </button>
+        <button id="newChatBtn" title="Start New Conversation" aria-label="Start new conversation" class="glass-icon-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <button id="guideBtn" title="Quick Setup Guide" aria-label="Open setup guide" class="glass-icon-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </button>
+        <button id="settingsBtn" title="Google Cloud Settings" aria-label="Open settings" class="glass-icon-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- 2. Slide-Out Chat History Drawer -->
+    <aside class="history-drawer" id="historyDrawer" aria-label="Conversation history" aria-hidden="true">
+      <div class="drawer-header">
+        <div class="drawer-title-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>Saved Conversations</span>
+        </div>
+        <button id="closeHistoryBtn" class="close-icon-btn" aria-label="Close history">&times;</button>
+      </div>
+      <div class="drawer-actions">
+        <button id="drawerNewChatBtn" class="primary-glass-action-btn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Start New Conversation</span>
+        </button>
+      </div>
+      <div class="sessions-list" id="sessionsList" role="list">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="drawer-footer">
+        <button id="clearAllHistoryBtn" class="danger-subtle-btn">Clear All History</button>
+      </div>
+    </aside>
+    <div class="drawer-backdrop" id="drawerBackdrop" aria-hidden="true"></div>
+
+    <!-- 3. Primary Conversation Stream -->
+    <main class="chat-container" id="chatContainer" role="log" aria-live="polite">
+      <!-- Quiet Luxury Empty State -->
+      <div class="welcome-card" id="welcomeCard">
+        <div class="welcome-icon-box" aria-hidden="true">
+          <img src="{{iconUri}}" alt="" class="welcome-icon" />
+          <div class="welcome-core-aura"></div>
+        </div>
+        <h2 class="welcome-title">Gemini 4 Argon</h2>
+        <p class="welcome-description">Google's flagship reasoning AI operating as your autonomous software engineer with full workspace and terminal access.</p>
+        
+        <!-- 4 Actionable Starter Prompts -->
+        <div class="welcome-chips" role="group" aria-label="Starter actions">
+          <button class="glass-chip" data-prompt="Perform a comprehensive audit of the workspace codebase, detect bugs and architectural debt, and propose actionable fixes.">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="3"/><line x1="14.5" y1="15.5" x2="18" y2="19"/></svg>
+            <span>Audit project codebase & architecture</span>
+          </button>
+          <button class="glass-chip" data-prompt="Inspect the active file, check edge cases, and optimize its logic and performance.">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/></svg>
+            <span>Audit and optimize active file</span>
+          </button>
+          <button class="glass-chip" data-prompt="Run the project test suite using run_command and explain any failures with exact fixes.">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 2v7.31M14 2v7.31M8.5 2h7M14 9.3a6.5 6.5 0 1 1-4 0"/></svg>
+            <span>Execute test suite and diagnose issues</span>
+          </button>
+          <button class="glass-chip" data-prompt="Map the repository architecture and explain key modules with get_workspace_structure.">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><line x1="10" y1="6.5" x2="14" y2="6.5"/><line x1="6.5" y1="10" x2="6.5" y2="14"/></svg>
+            <span>Map repository architecture tree</span>
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- 4. Docked Footer: Thinking Taskbar & Floating Composer -->
+    <footer class="docked-footer" role="region" aria-label="Message composition">
+      <!-- 3-Way Segmented Thinking Selector -->
+      <div class="dock-controls-row">
+        <span class="dock-label">Reasoning:</span>
+        <div class="segmented-control" id="modePills" role="radiogroup" aria-label="Thinking level">
+          <button class="segment-btn" data-level="low" role="radio" aria-checked="false" title="Low — Eco: Fast responses, minimal token consumption">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            <span>Low (Eco)</span>
+          </button>
+          <button class="segment-btn" data-level="medium" role="radio" aria-checked="false" title="Medium — Balanced: Balanced reasoning for daily feature work">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><circle cx="4" cy="12" r="2"/><circle cx="12" cy="10" r="2"/><circle cx="20" cy="14" r="2"/></svg>
+            <span>Medium</span>
+          </button>
+          <button class="segment-btn active" data-level="high" role="radio" aria-checked="true" title="High — Deep: Full recursive reasoning for architecture & deep audits">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3m-3.5-6.5l-2.1 2.1m-8.8 8.8l-2.1 2.1m13 0l-2.1-2.1m-8.8-8.8l-2.1-2.1"/></svg>
+            <span>High (Deep)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Execution Status Bar & Stop Controller -->
+      <div class="status-indicator-pill" id="statusBar" style="display: none;" role="status">
+        <div class="status-left">
+          <div class="status-pulse-dot" aria-hidden="true"></div>
+          <span id="statusMessage" class="status-text">Reasoning...</span>
+        </div>
+        <button id="abortBtn" class="abort-glass-btn" title="Stop Generation" aria-label="Stop generation">
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+          <span>Stop</span>
+        </button>
+      </div>
+
+      <!-- Floating Input Capsule -->
+      <div class="floating-input-capsule">
+        <textarea id="promptInput" rows="1" placeholder="Ask Gemini 4 Argon or assign an autonomous task..." aria-label="Message prompt input"></textarea>
+        <button id="sendBtn" class="send-glass-btn" title="Send (Enter)" aria-label="Send prompt">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+      </div>
+    </footer>
+
+    <!-- 5. Settings Modal (Portable Configuration) -->
+    <div class="modal-overlay" id="settingsModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="settingsDialogTitle">
+      <div class="glass-dialog">
+        <div class="dialog-header">
+          <div class="dialog-title-group">
+            <div class="dialog-icon-badge" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </div>
+            <h3 id="settingsDialogTitle">Google Cloud Configuration</h3>
+          </div>
+          <button id="closeSettingsBtn" class="close-btn" aria-label="Close settings">&times;</button>
+        </div>
+        <div class="dialog-body">
+          <p class="dialog-intro">Configure your Google Cloud Vertex AI access. Portable across any machine or project.</p>
+
+          <div class="form-group">
+            <label for="cfgProjectId">Google Cloud Project ID</label>
+            <input type="text" id="cfgProjectId" placeholder="e.g. your-project-id" />
+          </div>
+
+          <div class="form-group">
+            <label for="cfgLocation">Vertex AI Location</label>
+            <input type="text" id="cfgLocation" value="global" placeholder="global" />
+            <small class="form-hint">Gemini 4 Argon is hosted on the <code>global</code> endpoint.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="cfgAuthMethod">Authentication Method</label>
+            <select id="cfgAuthMethod">
+              <option value="adc">Application Default Credentials (ADC / gcloud)</option>
+              <option value="serviceAccount">Service Account Key (JSON file)</option>
+              <option value="apiKey">Vertex AI API Key</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="saFileGroup" style="display: none;">
+            <label for="cfgSaPath">Service Account JSON Key File</label>
+            <div class="input-with-button">
+              <input type="text" id="cfgSaPath" placeholder="Path to credentials.json" />
+              <button id="browseSaBtn" type="button" class="glass-btn">Browse...</button>
+            </div>
+          </div>
+
+          <div class="form-group" id="apiKeyGroup" style="display: none;">
+            <label for="cfgApiKey">API Key</label>
+            <input type="password" id="cfgApiKey" placeholder="AIzaSy..." />
+          </div>
+
+          <div class="adc-status-card" id="adcStatusInfo">
+            <div class="adc-status-header">
+              <span>Local ADC Status:</span>
+              <span id="adcDetectedBadge" class="status-badge">Checking...</span>
+            </div>
+            <div id="adcDetectedPath" class="adc-path-wrap">Not detected</div>
+          </div>
+
+          <div class="test-connection-section">
+            <button id="testConnBtn" type="button" class="test-glass-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+              <span>Test Connection</span>
+            </button>
+            <div id="testConnResult" class="test-result"></div>
+          </div>
+        </div>
+        <div class="dialog-footer">
+          <button id="cancelSettingsBtn" class="glass-btn">Cancel</button>
+          <button id="saveSettingsBtn" class="primary-3d-btn">Save Settings</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Quick Setup Guide Modal -->
+    <div class="modal-overlay" id="guideModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="guideDialogTitle">
+      <div class="glass-dialog">
+        <div class="dialog-header">
+          <div class="dialog-title-group">
+            <div class="dialog-icon-badge" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            </div>
+            <h3 id="guideDialogTitle">Quick Setup Guide</h3>
+          </div>
+          <button id="closeGuideBtn" class="close-btn" aria-label="Close guide">&times;</button>
+        </div>
+        <div class="dialog-body guide-scroll">
+          <div class="glass-step-card">
+            <div class="step-badge">Step 1</div>
+            <h4>Claim $300 Free Cloud Credits</h4>
+            <p>Visit <strong>cloud.google.com/free</strong> to activate your 90-day free trial. Google will never charge after trial without your permission.</p>
+          </div>
+
+          <div class="glass-step-card">
+            <div class="step-badge">Step 2</div>
+            <h4>Enable Vertex AI API & Get Project ID</h4>
+            <p>In Google Cloud Console, enable <strong>Vertex AI API</strong>. Copy your <strong>Project ID</strong> from the top navbar.</p>
+          </div>
+
+          <div class="glass-step-card">
+            <div class="step-badge">Step 3</div>
+            <h4>Configure Credentials in Extension</h4>
+            <p>Choose <strong>ADC</strong> (run <code>gcloud auth application-default login</code>), a <strong>Service Account JSON</strong> key, or an <strong>API Key</strong> in ⚙️ Settings.</p>
+          </div>
+
+          <div class="glass-step-card">
+            <div class="step-badge">Step 4</div>
+            <h4>Set a Budget Alert</h4>
+            <p>Set a budget alert in Cloud Billing ($10 / ₹1,000) to ensure peace of mind.</p>
+          </div>
+
+          <div class="full-guide-banner">
+            <div class="banner-title">Need Complete Step-by-Step Instructions?</div>
+            <p class="banner-sub">Read the full A-to-Z visual setup guide with screenshots on GitHub.</p>
+            <button id="openGithubReadmeBtn" class="github-action-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <span>View Full Setup Guide on GitHub</span>
+            </button>
+          </div>
+        </div>
+        <div class="dialog-footer">
+          <button id="gotItGuideBtn" class="primary-3d-btn">Got It, Let's Code!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{scriptUri}}"></script>
+</body>
+</html>
