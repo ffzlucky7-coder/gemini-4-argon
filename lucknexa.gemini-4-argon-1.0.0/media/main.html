@@ -7,7 +7,15 @@
   <link rel="stylesheet" href="{{styleUri}}">
 </head>
 <body>
-  <div class="agent-shell">
+  <div class="agent-shell" id="agentShell">
+    <!-- Drag & Drop Overlay -->
+    <div class="drag-drop-overlay" id="dragDropOverlay" style="display: none;">
+      <div class="drag-drop-box">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span>Drop images or files to attach</span>
+      </div>
+    </div>
+
     <!-- 1. Apple-Grade Frosted Glass Header -->
     <header class="glass-header" role="banner">
       <div class="brand">
@@ -17,8 +25,8 @@
         </div>
         <div class="brand-text">
           <div class="brand-title-row">
-            <span class="brand-title">Gemini 4 Argon</span>
-            <span class="brand-badge">Vertex AI</span>
+            <span class="brand-title" id="headerBrandTitle">Gemini 4 Argon</span>
+            <span class="brand-badge" id="headerBrandBadge">Vertex AI</span>
           </div>
           <span class="brand-author">by Lucky Kuntal</span>
         </div>
@@ -38,7 +46,7 @@
         <button id="guideBtn" title="Quick Setup Guide" aria-label="Open setup guide" class="glass-icon-btn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
         </button>
-        <button id="settingsBtn" title="Google Cloud Settings" aria-label="Open settings" class="glass-icon-btn">
+        <button id="settingsBtn" title="AI Settings & Credentials" aria-label="Open settings" class="glass-icon-btn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
       </div>
@@ -77,7 +85,7 @@
           <div class="welcome-core-aura"></div>
         </div>
         <h2 class="welcome-title">Gemini 4 Argon</h2>
-        <p class="welcome-description">Google's flagship reasoning AI operating as your autonomous software engineer with full workspace and terminal access.</p>
+        <p class="welcome-description">Google's flagship reasoning AI operating as your autonomous software engineer with full workspace, terminal, and multimodal vision access.</p>
         
         <!-- 4 Actionable Starter Prompts -->
         <div class="welcome-chips" role="group" aria-label="Starter actions">
@@ -134,16 +142,23 @@
         </button>
       </div>
 
+      <!-- Multimodal Attachment Preview Strip -->
+      <div class="attachment-preview-bar" id="attachmentPreviewBar" style="display: none;"></div>
+
       <!-- Floating Input Capsule -->
       <div class="floating-input-capsule">
-        <textarea id="promptInput" rows="1" placeholder="Ask Gemini 4 Argon or assign an autonomous task..." aria-label="Message prompt input"></textarea>
+        <input type="file" id="mediaFileInput" multiple accept="image/*,.pdf,.txt,.csv,.json,.js,.ts,.py,.html,.css" style="display: none;" />
+        <button id="attachFileBtn" class="attach-glass-btn" title="Attach image, screenshot, or code file" aria-label="Attach file">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+        </button>
+        <textarea id="promptInput" rows="1" placeholder="Ask Gemini 4 Argon or attach code, screenshots..." aria-label="Message prompt input"></textarea>
         <button id="sendBtn" class="send-glass-btn" title="Send (Enter)" aria-label="Send prompt">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
         </button>
       </div>
     </footer>
 
-    <!-- 5. Settings Modal (Portable Configuration) -->
+    <!-- 5. Settings Modal (AI Engine & Credentials) -->
     <div class="modal-overlay" id="settingsModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="settingsDialogTitle">
       <div class="glass-dialog">
         <div class="dialog-header">
@@ -151,52 +166,96 @@
             <div class="dialog-icon-badge" aria-hidden="true">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             </div>
-            <h3 id="settingsDialogTitle">Google Cloud Configuration</h3>
+            <h3 id="settingsDialogTitle">AI Engine & Configuration</h3>
           </div>
           <button id="closeSettingsBtn" class="close-btn" aria-label="Close settings">&times;</button>
         </div>
         <div class="dialog-body">
-          <p class="dialog-intro">Configure your Google Cloud Vertex AI access. Portable across any machine or project.</p>
-
+          <!-- Provider Engine Selection -->
           <div class="form-group">
-            <label for="cfgProjectId">Google Cloud Project ID</label>
-            <input type="text" id="cfgProjectId" placeholder="e.g. your-project-id" />
-          </div>
-
-          <div class="form-group">
-            <label for="cfgLocation">Vertex AI Location</label>
-            <input type="text" id="cfgLocation" value="global" placeholder="global" />
-            <small class="form-hint">Gemini 4 Argon is hosted on the <code>global</code> endpoint.</small>
-          </div>
-
-          <div class="form-group">
-            <label for="cfgAuthMethod">Authentication Method</label>
-            <select id="cfgAuthMethod">
-              <option value="adc">Application Default Credentials (ADC / gcloud)</option>
-              <option value="serviceAccount">Service Account Key (JSON file)</option>
-              <option value="apiKey">Vertex AI API Key</option>
+            <label for="cfgProvider">AI Engine</label>
+            <select id="cfgProvider">
+              <option value="vertex">Google Vertex AI (Gemini 4 Argon) [Default]</option>
+              <option value="claude">Anthropic Claude (Opus 5.5 / Sonnet 5.5)</option>
+              <option value="openai">OpenAI (GPT-6 Astra / Sol)</option>
             </select>
           </div>
 
-          <div class="form-group" id="saFileGroup" style="display: none;">
-            <label for="cfgSaPath">Service Account JSON Key File</label>
-            <div class="input-with-button">
-              <input type="text" id="cfgSaPath" placeholder="Path to credentials.json" />
-              <button id="browseSaBtn" type="button" class="glass-btn">Browse...</button>
+          <!-- Model Tier Selection -->
+          <div class="form-group" id="modelTierGroup">
+            <label for="cfgModelId">Model Tier</label>
+            <select id="cfgModelId">
+              <option value="gemini-4-argon">Gemini 4 Argon (Vertex AI Flagship)</option>
+              <option value="claude-opus-5.5">Claude Opus 5.5 (Deep Reasoning Flagship)</option>
+              <option value="claude-sonnet-5.5">Claude Sonnet 5.5 (Coding Workhorse)</option>
+              <option value="claude-fable-5.1">Claude Fable 5.1 (Mythos Frontier)</option>
+              <option value="claude-haiku-5.5">Claude Haiku 5.5 (Fast & Affordable)</option>
+              <option value="gpt-6-astra">GPT-6 Astra (Flagship Software Eng)</option>
+              <option value="gpt-6.1-sol">GPT-6.1 Sol (Near-Astra Heavy Coding)</option>
+              <option value="gpt-6-luna">GPT-6 Luna (Fast Everyday)</option>
+            </select>
+          </div>
+
+          <!-- Google Cloud Specific Fields -->
+          <div id="vertexConfigFields">
+            <div class="form-group">
+              <label for="cfgProjectId">Google Cloud Project ID</label>
+              <input type="text" id="cfgProjectId" placeholder="e.g. planar-hangout-510114-u1" />
+            </div>
+
+            <div class="form-group">
+              <label for="cfgLocation">Vertex AI Location</label>
+              <input type="text" id="cfgLocation" value="global" placeholder="global" />
+              <small class="form-hint">Gemini 4 Argon is hosted on the <code>global</code> endpoint.</small>
+            </div>
+
+            <div class="form-group">
+              <label for="cfgAuthMethod">Authentication Method</label>
+              <select id="cfgAuthMethod">
+                <option value="adc">Application Default Credentials (ADC / gcloud)</option>
+                <option value="serviceAccount">Service Account Key (JSON file)</option>
+                <option value="apiKey">Vertex AI API Key</option>
+              </select>
+            </div>
+
+            <div class="form-group" id="saFileGroup" style="display: none;">
+              <label for="cfgSaPath">Service Account JSON Key File</label>
+              <div class="input-with-button">
+                <input type="text" id="cfgSaPath" placeholder="Path to credentials.json" />
+                <button id="browseSaBtn" type="button" class="glass-btn">Browse...</button>
+              </div>
+            </div>
+
+            <div class="form-group" id="apiKeyGroup" style="display: none;">
+              <label for="cfgApiKey">Vertex AI API Key</label>
+              <input type="password" id="cfgApiKey" placeholder="AIzaSy..." />
+            </div>
+
+            <div class="adc-status-card" id="adcStatusInfo">
+              <div class="adc-status-header">
+                <span>Local ADC Status:</span>
+                <span id="adcDetectedBadge" class="status-badge">Checking...</span>
+              </div>
+              <div id="adcDetectedPath" class="adc-path-wrap">Not detected</div>
             </div>
           </div>
 
-          <div class="form-group" id="apiKeyGroup" style="display: none;">
-            <label for="cfgApiKey">API Key</label>
-            <input type="password" id="cfgApiKey" placeholder="AIzaSy..." />
+          <!-- Claude Specific Fields -->
+          <div id="claudeConfigFields" style="display: none;">
+            <div class="form-group">
+              <label for="cfgClaudeKey">Anthropic API Key</label>
+              <input type="password" id="cfgClaudeKey" placeholder="sk-ant-api03-..." />
+              <small class="form-hint">Enables Claude Opus 5.5 & Sonnet 5.5 directly in workspace.</small>
+            </div>
           </div>
 
-          <div class="adc-status-card" id="adcStatusInfo">
-            <div class="adc-status-header">
-              <span>Local ADC Status:</span>
-              <span id="adcDetectedBadge" class="status-badge">Checking...</span>
+          <!-- OpenAI Specific Fields -->
+          <div id="openAiConfigFields" style="display: none;">
+            <div class="form-group">
+              <label for="cfgOpenAiKey">OpenAI API Key</label>
+              <input type="password" id="cfgOpenAiKey" placeholder="sk-proj-..." />
+              <small class="form-hint">Enables GPT-6 Astra & Sol directly in workspace.</small>
             </div>
-            <div id="adcDetectedPath" class="adc-path-wrap">Not detected</div>
           </div>
 
           <div class="test-connection-section">
@@ -241,14 +300,14 @@
 
           <div class="glass-step-card">
             <div class="step-badge">Step 3</div>
-            <h4>Configure Credentials in Extension</h4>
-            <p>Choose <strong>ADC</strong> (run <code>gcloud auth application-default login</code>), a <strong>Service Account JSON</strong> key, or an <strong>API Key</strong> in ⚙️ Settings.</p>
+            <h4>Use with Claude & Codex (MCP Support)</h4>
+            <p>Claude Desktop, Claude Code, and Codex users can connect Gemini 4 Argon natively by adding <code>gemini-4-argon-mcp</code> to their config!</p>
           </div>
 
           <div class="glass-step-card">
             <div class="step-badge">Step 4</div>
-            <h4>Set a Budget Alert</h4>
-            <p>Set a budget alert in Cloud Billing ($10 / ₹1,000) to ensure peace of mind.</p>
+            <h4>Multimodal Attachments</h4>
+            <p>Click the <strong>📎 Paperclip</strong> icon or drag and drop screenshots, UI mockups, or documents directly into the chat.</p>
           </div>
 
           <div class="full-guide-banner">

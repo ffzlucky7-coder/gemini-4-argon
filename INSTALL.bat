@@ -1,7 +1,8 @@
 @echo off
 title Gemini 4 Argon Extension Installer
 echo =======================================================
-echo    Gemini 4 Argon Autonomous Agent Installer
+echo    Gemini 4 Argon Autonomous Agent Installer v1.1.0
+echo    Created by Lucky Kuntal (ffzlucky7-coder)
 echo =======================================================
 echo.
 
@@ -22,13 +23,23 @@ echo.
 echo [2/3] Registering extension with Antigravity IDE CLI...
 where antigravity-ide.cmd >nul 2>nul
 if %ERRORLEVEL% equ 0 (
-    echo Running: antigravity-ide.cmd --install-extension gemini-4-argon-1.0.0.vsix
-    call antigravity-ide.cmd --install-extension "%~dp0gemini-4-argon-1.0.0.vsix" --force
+    if exist "%~dp0gemini-4-argon-1.1.0.vsix" (
+        echo Running: antigravity-ide.cmd --install-extension gemini-4-argon-1.1.0.vsix
+        call antigravity-ide.cmd --install-extension "%~dp0gemini-4-argon-1.1.0.vsix" --force
+    ) else if exist "%~dp0gemini-4-argon-1.0.0.vsix" (
+        echo Running: antigravity-ide.cmd --install-extension gemini-4-argon-1.0.0.vsix
+        call antigravity-ide.cmd --install-extension "%~dp0gemini-4-argon-1.0.0.vsix" --force
+    )
 ) else (
     where code >nul 2>nul
     if %ERRORLEVEL% equ 0 (
-        echo Running: code --install-extension gemini-4-argon-1.0.0.vsix
-        call code --install-extension "%~dp0gemini-4-argon-1.0.0.vsix" --force
+        if exist "%~dp0gemini-4-argon-1.1.0.vsix" (
+            echo Running: code --install-extension gemini-4-argon-1.1.0.vsix
+            call code --install-extension "%~dp0gemini-4-argon-1.1.0.vsix" --force
+        ) else if exist "%~dp0gemini-4-argon-1.0.0.vsix" (
+            echo Running: code --install-extension gemini-4-argon-1.0.0.vsix
+            call code --install-extension "%~dp0gemini-4-argon-1.0.0.vsix" --force
+        )
     )
 )
 
@@ -36,7 +47,7 @@ echo.
 echo =======================================================
 echo  SUCCESS: Gemini 4 Argon Extension has been installed!
 echo.
-echo  To activate in Antigravity IDE:
+echo  To activate in Antigravity IDE / VS Code:
 echo   1. Restart Antigravity IDE OR press Ctrl+Shift+P and run:
 echo      "Developer: Reload Window"
 echo   2. You will see the glowing Gemini 4 Argon icon in the

@@ -1,14 +1,17 @@
 {
   "name": "gemini-4-argon",
   "displayName": "Gemini 4 Argon Autonomous Agent",
-  "description": "Google Flagship Gemini 4 Argon Autonomous Coding & Auditing Agent with full workspace, file, and terminal execution powers.",
-  "version": "1.0.0",
+  "description": "Google Flagship Gemini 4 Argon Autonomous Coding & Auditing Agent with full workspace, file, multimodal attachments, and Claude/Codex MCP support.",
+  "version": "1.1.0",
   "icon": "media/icon.png",
   "publisher": "ffzlucky7-coder",
   "author": "Lucky Kuntal (https://github.com/ffzlucky7-coder)",
   "repository": {
     "type": "git",
     "url": "https://github.com/ffzlucky7-coder/gemini-4-argon"
+  },
+  "bin": {
+    "gemini-4-argon-mcp": "./mcp/server.js"
   },
   "engines": {
     "vscode": "^1.85.0"
@@ -22,6 +25,10 @@
     "gemini",
     "gemini-4-argon",
     "argon",
+    "claude",
+    "mcp",
+    "codex",
+    "multimodal",
     "agent",
     "vertex-ai",
     "ai"
@@ -70,7 +77,7 @@
       },
       {
         "command": "gemini-4-argon.configureCredentials",
-        "title": "Configure Google Cloud Settings",
+        "title": "Configure AI Engine Settings",
         "category": "Gemini 4 Argon"
       },
       {
@@ -96,6 +103,17 @@
     "configuration": {
       "title": "Gemini 4 Argon Agent",
       "properties": {
+        "gemini4Argon.provider": {
+          "type": "string",
+          "enum": ["vertex", "claude", "openai"],
+          "default": "vertex",
+          "description": "Primary AI Engine (Google Vertex AI, Anthropic Claude, or OpenAI)."
+        },
+        "gemini4Argon.modelId": {
+          "type": "string",
+          "default": "gemini-4-argon",
+          "description": "Selected model tier (e.g. gemini-4-argon, claude-opus-5.5, gpt-6-astra)."
+        },
         "gemini4Argon.projectId": {
           "type": "string",
           "default": "planar-hangout-510114-u1",
@@ -127,6 +145,16 @@
           "type": "string",
           "default": "",
           "description": "Google Cloud Vertex AI API Key (for API Key auth)."
+        },
+        "gemini4Argon.claudeApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Anthropic API Key (for Claude Opus 5.5, Sonnet 5.5)."
+        },
+        "gemini4Argon.openAiApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "OpenAI API Key (for GPT-6 Astra, Sol)."
         }
       }
     }

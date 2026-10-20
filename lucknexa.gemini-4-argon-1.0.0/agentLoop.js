@@ -1,21 +1,26 @@
 /**
  * agentLoop.js
- * Multi-turn autonomous agent execution loop powered by Google Gemini 4 Argon.
+ * Multi-turn autonomous agent execution loop supporting Gemini 4 Argon, Claude 5.x, and GPT-6
  * Features:
  *  - Full workspace autonomous tool orchestration
- *  - Low / Medium / High Thinking Level control
+ *  - Multimodal media/file attachments (Images, Audio, PDF, Code)
+ *  - Dynamic Thinking Level control (Low, Medium, High)
+ *  - Multi-provider dispatching (Vertex AI, Anthropic Claude, OpenAI)
  *  - Real-time event streaming to Webview UI
  *  - Automatic error recovery and abort handling
+ * 
+ * Author: Lucky Kuntal (https://github.com/ffzlucky7-coder)
  */
 
-const { getAuthHeaders } = require('./authProvider');
-const { vertexAIToolDeclarations, executeTool } = require('./tools');
+const { executeTool } = require('./tools');
+const { ProviderAdapter } = require('./providerAdapter');
 
 const SYSTEM_INSTRUCTION = `You are Gemini 4 Argon, Google's flagship reasoning AI model, operating as an autonomous software engineer and architect inside the Antigravity IDE.
 You have FULL autonomous access to the user's workspace:
 - You can inspect files (read_file), search the codebase (search_code), and explore directories (list_dir, get_workspace_structure).
-- You can edit existing code (edit_file) and create new files (write_file). Backups are created automatically.
+- You can edit existing code (edit_file) and create new files (write_file). Backups are created automatically (.argon_bak).
 - You can run terminal commands (run_command) such as running test suites (pytest, npm test), linters, git commands, and builds.
+- You are natively multimodal: you can inspect attached screenshots, UI mockups, diagrams, documents, and data files.
 
 GUIDELINES:
 1. Always investigate the codebase first using your tools before jumping to conclusions.
@@ -30,10 +35,12 @@ class GeminiAgent {
     this.config = config || {};
     this.history = [];
     this.abortController = null;
+    this.providerAdapter = new ProviderAdapter(this.config, workspaceRoot);
   }
 
   updateConfig(newConfig) {
     this.config = { ...this.config, ...newConfig };
+    this.providerAdapter.updateConfig(this.config);
   }
 
   clearHistory() {
@@ -47,26 +54,54 @@ class GeminiAgent {
     }
   }
 
-  async run(prompt, onEvent) {
+  async run(prompt, onEvent, attachments = []) {
     this.abortController = new AbortController();
     const signal = this.abortController.signal;
 
-    const projectId = this.config.projectId || 'planar-hangout-510114-u1';
-    const location = this.config.location || 'global';
     const thinkingLevel = (this.config.thinkingLevel || 'high').toLowerCase();
+    const provider = (this.config.provider || 'vertex').toLowerCase();
+    const modelId = this.providerAdapter.getModelId();
 
-    const url = `https://aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/gemini-4-argon:generateContent`;
+    // Construct user parts with text and optional multimodal attachments
+    const userParts = [];
+    if (prompt && prompt.trim()) {
+      userParts.push({ text: prompt.trim() });
+    }
+
+    if (Array.isArray(attachments) && attachments.length > 0) {
+      for (const att of attachments) {
+        const b64 = att.base64Data || att.data;
+        if (b64 && att.mimeType) {
+          userParts.push({
+            inlineData: {
+              mimeType: att.mimeType,
+              data: b64
+            }
+          });
+        }
+      }
+    }
+
+    if (userParts.length === 0) {
+      userParts.push({ text: 'Continue' });
+    }
 
     // Append new user message to conversation history
     this.history.push({
       role: 'user',
-      parts: [{ text: prompt }]
+      parts: userParts
     });
+
+    const modelDisplayName = provider === 'claude'
+      ? `Claude (${modelId})`
+      : provider === 'openai'
+      ? `OpenAI (${modelId})`
+      : `Gemini 4 Argon`;
 
     onEvent({
       type: 'status',
       status: 'thinking',
-      message: `Gemini 4 Argon is thinking (${thinkingLevel.toUpperCase()} reasoning mode)...`
+      message: `${modelDisplayName} is reasoning (${thinkingLevel.toUpperCase()} mode)...`
     });
 
     const MAX_TURNS = 25;
@@ -80,81 +115,40 @@ class GeminiAgent {
         return;
       }
 
-      let headers;
+      let turnResult;
       try {
-        headers = await getAuthHeaders(this.config);
-      } catch (authErr) {
-        onEvent({ type: 'error', error: `Authentication failed: ${authErr.message}` });
-        return;
-      }
-
-      const requestBody = {
-        systemInstruction: {
-          parts: [{ text: SYSTEM_INSTRUCTION }]
-        },
-        contents: this.history,
-        tools: [
-          {
-            functionDeclarations: vertexAIToolDeclarations
-          }
-        ],
-        generationConfig: {
-          temperature: 0.2,
-          maxOutputTokens: 8192,
-          thinkingConfig: {
-            thinkingLevel: thinkingLevel
-          }
-        }
-      };
-
-      let resp;
-      try {
-        resp = await fetch(url, {
-          method: 'POST',
-          headers: headers,
-          body: JSON.stringify(requestBody),
-          signal: signal
+        turnResult = await this.providerAdapter.executeTurn({
+          history: this.history,
+          systemInstruction: SYSTEM_INSTRUCTION,
+          thinkingLevel: thinkingLevel,
+          attachments: attachments,
+          signal: signal,
+          onEvent: onEvent
         });
-      } catch (fetchErr) {
+      } catch (turnErr) {
         if (signal.aborted) {
           onEvent({ type: 'error', error: 'Request was cancelled.' });
           return;
         }
-        onEvent({ type: 'error', error: `Network error connecting to Gemini 4 Argon: ${fetchErr.message}` });
+        onEvent({ type: 'error', error: turnErr.message });
         return;
       }
-
-      if (!resp.ok) {
-        const errJson = await resp.json().catch(() => ({}));
-        const msg = errJson.error?.message || `HTTP ${resp.status}: ${resp.statusText}`;
-        onEvent({ type: 'error', error: `Vertex AI Error (${resp.status}): ${msg}` });
-        return;
-      }
-
-      const responseData = await resp.json();
-      const candidate = responseData.candidates?.[0];
-
-      if (!candidate || !candidate.content || !candidate.content.parts) {
-        onEvent({ type: 'error', error: 'Empty response received from Gemini 4 Argon.' });
-        return;
-      }
-
-      const parts = candidate.content.parts;
-      const functionCalls = parts.filter(p => p.functionCall);
 
       // Record model response into history
       this.history.push({
         role: 'model',
-        parts: parts
+        parts: turnResult.rawParts || [{ text: turnResult.text }]
       });
 
-      // If no function calls, the model produced final text response
+      const functionCalls = turnResult.functionCalls || [];
+
+      // If no function calls, the model produced its final response
       if (functionCalls.length === 0) {
-        const textParts = parts.filter(p => p.text).map(p => p.text).join('\n');
         onEvent({
           type: 'text',
-          content: textParts,
-          usage: responseData.usageMetadata
+          content: turnResult.text,
+          model: turnResult.model,
+          provider: turnResult.provider
         });
         onEvent({ type: 'status', status: 'idle', message: 'Ready' });
         return;
@@ -163,10 +157,9 @@ class GeminiAgent {
       // Execute each function call autonomously
       const responseParts = [];
 
-      for (const part of functionCalls) {
+      for (const call of functionCalls) {
         if (signal.aborted) return;
 
-        const call = part.functionCall;
         const callId = call.id || `call_${Date.now()}`;
 
         onEvent({
@@ -201,37 +194,30 @@ class GeminiAgent {
           functionResponse: {
             name: call.name,
             response: {
-              result: toolResult
+              content: toolResult
             }
           }
         };
+
         if (call.id) {
           funcRespPart.functionResponse.id = call.id;
         }
+
         responseParts.push(funcRespPart);
       }
 
-      // In Gemini API, all parallel tool responses must be returned in a single turn matching the call parts
+      // Append all tool execution responses to history for next model turn
       this.history.push({
         role: 'user',
         parts: responseParts
       });
-
-      onEvent({
-        type: 'status',
-        status: 'thinking',
-        message: `Gemini 4 Argon is reasoning over tool results...`
-      });
     }
 
     onEvent({
-      type: 'text',
-      content: '⚠️ Maximum autonomous agent turn limit (25 turns) reached.'
+      type: 'error',
+      error: `Autonomous loop exceeded max turn limit (${MAX_TURNS}).`
     });
-    onEvent({ type: 'status', status: 'idle', message: 'Ready' });
   }
 }
 
-module.exports = {
-  GeminiAgent
-};
+module.exports = { GeminiAgent, SYSTEM_INSTRUCTION };

@@ -104,6 +104,24 @@
   const adcDetectedBadge = document.getElementById('adcDetectedBadge');
   const adcDetectedPath = document.getElementById('adcDetectedPath');
 
+  // Multimodal Attachment Elements
+  const attachFileBtn = document.getElementById('attachFileBtn');
+  const mediaFileInput = document.getElementById('mediaFileInput');
+  const attachmentPreviewBar = document.getElementById('attachmentPreviewBar');
+  const dragDropOverlay = document.getElementById('dragDropOverlay');
+
+  // Multi-Provider & Model Elements
+  const cfgProvider = document.getElementById('cfgProvider');
+  const cfgModelId = document.getElementById('cfgModelId');
+  const vertexConfigFields = document.getElementById('vertexConfigFields');
+  const claudeConfigFields = document.getElementById('claudeConfigFields');
+  const openAiConfigFields = document.getElementById('openAiConfigFields');
+  const cfgClaudeKey = document.getElementById('cfgClaudeKey');
+  const cfgOpenAiKey = document.getElementById('cfgOpenAiKey');
+
+  // Attachment state
+  let currentAttachments = [];
+
   // ==========================================================================
   // 1. THEME MANAGEMENT (Apple Ceramic & Deep Space Glass)
   // ==========================================================================
@@ -160,10 +178,142 @@
     });
   }
 
+  function formatFileSize(bytes) {
+    if (!bytes || bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
+  }
+
+  function renderAttachmentChips() {
+    if (!attachmentPreviewBar) return;
+    attachmentPreviewBar.innerHTML = '';
+
+    if (currentAttachments.length === 0) {
+      attachmentPreviewBar.style.display = 'none';
+      updateSendBtnState();
+      return;
+    }
+
+    attachmentPreviewBar.style.display = 'flex';
+
+    currentAttachments.forEach((att, idx) => {
+      const chip = document.createElement('div');
+      chip.className = 'attachment-chip';
+
+      if (att.mimeType && att.mimeType.startsWith('image/') && att.thumbUrl) {
+        const img = document.createElement('img');
+        img.className = 'attachment-thumb';
+        img.src = att.thumbUrl;
+        img.alt = att.name;
+        chip.appendChild(img);
+      } else {
+        const iconWrap = document.createElement('div');
+        iconWrap.className = 'attachment-chip-icon';
+        iconWrap.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>';
+        chip.appendChild(iconWrap);
+      }
+
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'attachment-chip-name';
+      nameSpan.textContent = att.name;
+      chip.appendChild(nameSpan);
+
+      const sizeSpan = document.createElement('span');
+      sizeSpan.className = 'attachment-chip-size';
+      sizeSpan.textContent = formatFileSize(att.size);
+      chip.appendChild(sizeSpan);
+
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'attachment-remove-btn';
+      removeBtn.setAttribute('title', 'Remove attachment');
+      removeBtn.innerHTML = '&times;';
+      removeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentAttachments.splice(idx, 1);
+        renderAttachmentChips();
+      });
+      chip.appendChild(removeBtn);
+
+      attachmentPreviewBar.appendChild(chip);
+    });
+
+    updateSendBtnState();
+  }
+
+  function handleFiles(files) {
+    if (!files || files.length === 0) return;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target.result;
+        const parts = dataUrl.split(';base64,');
+        const mimeType = file.type || 'application/octet-stream';
+        const base64Data = parts[1] || '';
+
+        currentAttachments.push({
+          name: file.name,
+          mimeType: mimeType,
+          size: file.size,
+          base64Data: base64Data,
+          thumbUrl: file.type.startsWith('image/') ? dataUrl : null
+        });
+        renderAttachmentChips();
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  if (attachFileBtn && mediaFileInput) {
+    attachFileBtn.addEventListener('click', () => {
+      mediaFileInput.click();
+    });
+
+    mediaFileInput.addEventListener('change', () => {
+      if (mediaFileInput.files) {
+        handleFiles(mediaFileInput.files);
+        mediaFileInput.value = '';
+      }
+    });
+  }
+
+  // Drag and Drop Handling
+  let dragCounter = 0;
+  window.addEventListener('dragenter', (e) => {
+    e.preventDefault();
+    dragCounter++;
+    if (dragDropOverlay) dragDropOverlay.style.display = 'flex';
+  });
+
+  window.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    dragCounter--;
+    if (dragCounter <= 0) {
+      dragCounter = 0;
+      if (dragDropOverlay) dragDropOverlay.style.display = 'none';
+    }
+  });
+
+  window.addEventListener('dragover', (e) => {
+    e.preventDefault();
+  });
+
+  window.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dragCounter = 0;
+    if (dragDropOverlay) dragDropOverlay.style.display = 'none';
+    if (e.dataTransfer && e.dataTransfer.files) {
+      handleFiles(e.dataTransfer.files);
+    }
+  });
+
   function updateSendBtnState() {
     if (!sendBtn || !promptInput) return;
     const hasText = promptInput.value.trim().length > 0;
-    sendBtn.disabled = !hasText || isThinking;
+    const hasAttachments = currentAttachments.length > 0;
+    sendBtn.disabled = (!hasText && !hasAttachments) || isThinking;
   }
 
   if (sendBtn) {
@@ -185,19 +335,22 @@
   // ==========================================================================
   function sendMessage(customPrompt) {
     const text = customPrompt || (promptInput ? promptInput.value.trim() : '');
-    if (!text || isThinking) return;
+    const hasAttachments = currentAttachments.length > 0;
+    if ((!text && !hasAttachments) || isThinking) return;
 
     if (welcomeCard) {
       welcomeCard.style.display = 'none';
     }
 
-    appendMessage('user', text);
+    const attachmentsToSend = currentAttachments.slice();
+    appendMessage('user', text || `[Attached ${attachmentsToSend.length} file(s)]`, attachmentsToSend);
 
     if (promptInput) {
       promptInput.value = '';
       promptInput.style.height = 'auto';
     }
-    updateSendBtnState();
+    currentAttachments = [];
+    renderAttachmentChips();
 
     isThinking = true;
     showStatus(`Reasoning (${currentThinkingLevel.toUpperCase()})...`);
@@ -205,7 +358,13 @@
     vscode.postMessage({
       type: 'sendMessage',
       text: text,
-      thinkingLevel: currentThinkingLevel
+      thinkingLevel: currentThinkingLevel,
+      attachments: attachmentsToSend.map(a => ({
+        name: a.name,
+        mimeType: a.mimeType,
+        size: a.size,
+        base64Data: a.base64Data
+      }))
     });
   }
 
@@ -417,14 +576,52 @@
     });
   }
 
+  function updateProviderFieldsVisibility(provider) {
+    if (!cfgProvider) return;
+    const p = (provider || 'vertex').toLowerCase();
+    if (vertexConfigFields) vertexConfigFields.style.display = p === 'vertex' ? 'block' : 'none';
+    if (claudeConfigFields) claudeConfigFields.style.display = p === 'claude' ? 'block' : 'none';
+    if (openAiConfigFields) openAiConfigFields.style.display = p === 'openai' ? 'block' : 'none';
+
+    if (cfgModelId) {
+      const options = cfgModelId.options;
+      let firstVisibleVal = null;
+      for (let i = 0; i < options.length; i++) {
+        const opt = options[i];
+        let visible = false;
+        if (p === 'vertex' && opt.value.startsWith('gemini')) visible = true;
+        if (p === 'claude' && opt.value.startsWith('claude')) visible = true;
+        if (p === 'openai' && opt.value.startsWith('gpt')) visible = true;
+
+        opt.style.display = visible ? '' : 'none';
+        opt.disabled = !visible;
+        if (visible && !firstVisibleVal) firstVisibleVal = opt.value;
+      }
+      const currentSelectedOpt = cfgModelId.options[cfgModelId.selectedIndex];
+      if (currentSelectedOpt && currentSelectedOpt.disabled && firstVisibleVal) {
+        cfgModelId.value = firstVisibleVal;
+      }
+    }
+  }
+
+  if (cfgProvider) {
+    cfgProvider.addEventListener('change', () => {
+      updateProviderFieldsVisibility(cfgProvider.value);
+    });
+  }
+
   if (saveSettingsBtn) {
     saveSettingsBtn.addEventListener('click', () => {
       const config = {
+        provider: cfgProvider ? cfgProvider.value : 'vertex',
+        modelId: cfgModelId ? cfgModelId.value : 'gemini-4-argon',
         projectId: cfgProjectId ? cfgProjectId.value.trim() : '',
         location: cfgLocation ? cfgLocation.value.trim() || 'global' : 'global',
         authMethod: cfgAuthMethod ? cfgAuthMethod.value : 'adc',
         serviceAccountKeyPath: cfgSaPath ? cfgSaPath.value.trim() : '',
         apiKey: cfgApiKey ? cfgApiKey.value.trim() : '',
+        claudeApiKey: cfgClaudeKey ? cfgClaudeKey.value.trim() : '',
+        openAiApiKey: cfgOpenAiKey ? cfgOpenAiKey.value.trim() : '',
         thinkingLevel: currentThinkingLevel
       };
       vscode.postMessage({ type: 'saveConfig', config });
@@ -435,17 +632,22 @@
   if (testConnBtn) {
     testConnBtn.addEventListener('click', () => {
       const config = {
+        provider: cfgProvider ? cfgProvider.value : 'vertex',
+        modelId: cfgModelId ? cfgModelId.value : 'gemini-4-argon',
         projectId: cfgProjectId ? cfgProjectId.value.trim() : '',
         location: cfgLocation ? cfgLocation.value.trim() || 'global' : 'global',
         authMethod: cfgAuthMethod ? cfgAuthMethod.value : 'adc',
         serviceAccountKeyPath: cfgSaPath ? cfgSaPath.value.trim() : '',
         apiKey: cfgApiKey ? cfgApiKey.value.trim() : '',
+        claudeApiKey: cfgClaudeKey ? cfgClaudeKey.value.trim() : '',
+        openAiApiKey: cfgOpenAiKey ? cfgOpenAiKey.value.trim() : '',
         thinkingLevel: 'low'
       };
       if (testConnResult) {
         testConnResult.className = 'test-result';
         testConnResult.style.display = 'block';
-        testConnResult.textContent = 'Testing connection to Gemini 4 Argon...';
+        const pName = config.provider === 'claude' ? 'Claude' : (config.provider === 'openai' ? 'OpenAI' : 'Gemini 4 Argon');
+        testConnResult.textContent = `Testing connection to ${pName}...`;
       }
       vscode.postMessage({ type: 'testConnection', config });
     });
@@ -528,16 +730,63 @@
   // ==========================================================================
   // 7. MARKDOWN ENGINE WITH FENCED CODE BLOCKS & 1-CLICK COPY
   // ==========================================================================
-  function appendMessage(role, content) {
+  function appendMessage(role, content, attachments) {
     if (!chatContainer) return;
     const msgDiv = document.createElement('div');
     msgDiv.className = `message ${role}`;
 
+    // Render attachments if present
+    if (Array.isArray(attachments) && attachments.length > 0) {
+      const attWrap = document.createElement('div');
+      attWrap.className = 'message-attachments';
+      attachments.forEach((att) => {
+        const item = document.createElement('div');
+        item.className = 'message-attachment-item';
+
+        if (att.mimeType && att.mimeType.startsWith('image/') && (att.thumbUrl || att.base64Data)) {
+          const img = document.createElement('img');
+          img.className = 'message-attachment-thumb';
+          img.src = att.thumbUrl || `data:${att.mimeType};base64,${att.base64Data}`;
+          img.alt = att.name || 'Attachment';
+          item.appendChild(img);
+        } else {
+          const iconSpan = document.createElement('span');
+          iconSpan.style.display = 'inline-flex';
+          iconSpan.style.alignItems = 'center';
+          iconSpan.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>';
+          item.appendChild(iconSpan);
+        }
+
+        const details = document.createElement('div');
+        details.className = 'message-attachment-details';
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'message-attachment-name';
+        nameSpan.textContent = att.name || 'file';
+        details.appendChild(nameSpan);
+
+        if (att.size) {
+          const sizeSpan = document.createElement('span');
+          sizeSpan.className = 'message-attachment-size';
+          sizeSpan.textContent = formatFileSize(att.size);
+          details.appendChild(sizeSpan);
+        }
+
+        item.appendChild(details);
+        attWrap.appendChild(item);
+      });
+      msgDiv.appendChild(attWrap);
+    }
+
     if (role === 'user') {
-      msgDiv.textContent = content;
+      const textSpan = document.createElement('div');
+      textSpan.textContent = content;
+      msgDiv.appendChild(textSpan);
     } else {
-      msgDiv.innerHTML = formatMarkdown(content);
-      attachCodeCopyListeners(msgDiv);
+      const bodySpan = document.createElement('div');
+      bodySpan.innerHTML = formatMarkdown(content);
+      attachCodeCopyListeners(bodySpan);
+      msgDiv.appendChild(bodySpan);
     }
 
     chatContainer.appendChild(msgDiv);
@@ -655,8 +904,13 @@
         if (cfgAuthMethod) cfgAuthMethod.value = cfg.authMethod || 'adc';
         if (cfgSaPath) cfgSaPath.value = cfg.serviceAccountKeyPath || '';
         if (cfgApiKey) cfgApiKey.value = cfg.apiKey || '';
+        if (cfgProvider) cfgProvider.value = cfg.provider || 'vertex';
+        if (cfgModelId) cfgModelId.value = cfg.modelId || 'gemini-4-argon';
+        if (cfgClaudeKey) cfgClaudeKey.value = cfg.claudeApiKey || '';
+        if (cfgOpenAiKey) cfgOpenAiKey.value = cfg.openAiApiKey || '';
 
         updateAuthFieldsVisibility(cfg.authMethod || 'adc');
+        updateProviderFieldsVisibility(cfg.provider || 'vertex');
 
         if (cfg.thinkingLevel) {
           currentThinkingLevel = cfg.thinkingLevel;
@@ -685,7 +939,7 @@
           if (welcomeCard) welcomeCard.style.display = 'none';
           if (chatContainer) {
             chatContainer.innerHTML = '';
-            msg.currentSession.messages.forEach((m) => appendMessage(m.role, m.content));
+            msg.currentSession.messages.forEach((m) => appendMessage(m.role, m.content, m.attachments));
           }
         }
         break;
@@ -704,7 +958,7 @@
           }
         } else {
           if (welcomeCard) welcomeCard.style.display = 'none';
-          sess.messages.forEach((m) => appendMessage(m.role, m.content));
+          sess.messages.forEach((m) => appendMessage(m.role, m.content, m.attachments));
         }
 
         if (sess.thinkingLevel) {

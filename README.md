@@ -1,66 +1,116 @@
-# 🚀 Gemini 4 Argon Autonomous Agent for Antigravity IDE & VS Code
+# 🚀 Gemini 4 Argon Autonomous Agent for Antigravity IDE, VS Code, Claude & Codex
 
 ### 👨‍💻 Created by [Lucky Kuntal](https://github.com/ffzlucky7-coder)
 
 [![Author](https://img.shields.io/badge/Author-Lucky%20Kuntal-ff007f.svg?style=flat&logo=github)](https://github.com/ffzlucky7-coder)
-[![Release](https://img.shields.io/badge/Release-v1.0.0-00d2ff.svg)](https://github.com/ffzlucky7-coder/gemini-4-argon)
+[![Release](https://img.shields.io/badge/Release-v1.1.0-00d2ff.svg)](https://github.com/ffzlucky7-coder/gemini-4-argon)
+[![MCP Server](https://img.shields.io/badge/MCP-JSON--RPC%202.0-10b981.svg)](https://modelcontextprotocol.io)
 [![Engine](https://img.shields.io/badge/Engine-Google%20Vertex%20AI-4285F4.svg)](https://cloud.google.com/vertex-ai)
-[![Model](https://img.shields.io/badge/Model-Gemini%204%20Argon-7f00ff.svg)](https://cloud.google.com/vertex-ai)
-[![IDE](https://img.shields.io/badge/IDE-Antigravity%20%7C%20VS%20Code-38bdf8.svg)](https://github.com/ffzlucky7-coder/gemini-4-argon)
+[![Models](https://img.shields.io/badge/Models-Gemini%204%20Argon%20%7C%20Claude%20Opus%205.5%20%7C%20GPT--6-7f00ff.svg)](https://github.com/ffzlucky7-coder/gemini-4-argon)
+[![Attachments](https://img.shields.io/badge/Multimodal-Vision%20%2B%20Docs-f59e0b.svg)](#)
+[![IDE](https://img.shields.io/badge/IDE-Antigravity%20%7C%20VS%20Code%20%7C%20Claude%20%7C%20Codex-38bdf8.svg)](https://github.com/ffzlucky7-coder/gemini-4-argon)
 [![Design](https://img.shields.io/badge/UI-Apple--Grade%20Glass-818cf8.svg)](#)
 [![License](https://img.shields.io/badge/License-MIT-34d399.svg)](LICENSE)
 
-> Developed by **Lucky Kuntal**, this extension integrates **Google's Flagship Gemini 4 Argon Reasoning AI** natively into Antigravity IDE and VS Code as a full-power autonomous software engineer and architect with complete workspace, file, and terminal execution powers.
+> Developed by **Lucky Kuntal**, **Gemini 4 Argon** is a frontier autonomous software engineering agent that runs natively inside **Antigravity IDE**, **VS Code**, **Claude Desktop**, and **Codex**. It features native multimodal attachments, deep reasoning budgets, autonomous workspace modification tools with automatic backups, and seamless multi-model support across **Gemini 4 Argon**, **Claude Opus 5.5**, and **GPT-6 Astra**.
 
 ---
 
-## 🌟 Key Highlights & Capabilities
+## 🌟 What's New in v1.1.0
 
-- 🤖 **Full Autonomous Workspace Power**:
-  - `read_file`: Reads any file with line-number precision and range slicing.
-  - `write_file`: Creates and overwrites files with automatic directory generation.
-  - `edit_file`: Performs surgical search-and-replace code refactoring.
-  - `list_dir` & `get_workspace_structure`: Maps the entire project architecture and directory trees.
-  - `search_code`: Ultra-fast symbol and keyword searching across the repository.
-  - `run_command`: Directly runs test suites (`pytest`, `npm test`, `cargo test`), linters, git commands, and build scripts.
-- 🛡️ **Zero-Loss Safety Net**: Automatically creates a `.argon_bak` backup before modifying or overwriting any existing file.
-- 🧠 **Dynamic 3-Level Reasoning Mode (Token & Speed Controller)**:
-  - **`⚡ Low (Eco)`**: Lightning-fast execution, minimal token usage — ideal for quick edits, documentation, and simple questions.
-  - **`⚖️ Medium`**: Balanced reasoning — perfect for daily feature development and bug hunting.
-  - **`🧠 High (Deep Reasoning)`**: Full recursive reasoning budget — built for AAA architecture, deep code refactoring, security audits, and complex root-cause debugging.
-- 🕒 **Persistent Multi-Session Chat History & Memory**:
-  - Automatically saves all conversations across sessions, reloads, and IDE restarts.
-  - Slide-out History Drawer lets you resume previous tasks, view timestamps and message counts, or start a fresh session with 1 click.
-- 💎 **Apple-Grade Glassmorphic 3D UI**:
-  - Refractive frosted glass aesthetics with ambient specular highlights.
-  - Bottom-docked reasoning mode taskbar (Cursor / ChatGPT layout).
-  - High-contrast typography optimized for both **Dark Mode** and **Light Mode**.
-  - 100% crisp vector SVG icons (zero cheap emojis).
-- ⚡ **Zero Bloat, High-Performance Engine**: Built entirely with native Node.js APIs (zero heavy `node_modules`). The entire extension is only **37 KB**!
-- 🌐 **Universal Portability (Multi-User Ready)**: Anyone can install this extension and configure their own Google Cloud Project ID and credentials in seconds via the in-app **⚙️ Settings** dialog.
-- 🔌 **Built-in Live Connection Tester**: 1-click test button verifies Vertex AI connection, token validity, and round-trip latency in real-time.
+- 📎 **Multimodal File & Media Attachments**:
+  - Drag-and-drop screenshots, architecture diagrams, UI mockups, or documents directly into the chat window.
+  - Native paperclip button supporting images (`PNG`, `JPEG`, `WEBP`, `GIF`), documents (`PDF`, `TXT`, `CSV`, `JSON`), and source code files.
+  - Real-time glass preview chips with file size badges and one-click removal.
+- 🔌 **Claude Desktop & Codex Native MCP Server (`mcp/server.js`)**:
+  - Full **Model Context Protocol (JSON-RPC 2.0)** server running over standard I/O (`stdio`).
+  - Seamlessly gives **Claude Desktop**, **Claude Code**, **Cursor**, and **Codex** full autonomous access to all 7 workspace tools plus `gemini_4_argon_reason`.
+- 🧠 **Multi-Model Provider Adapter**:
+  - **Google Vertex AI (Default)**: Flagship `gemini-4-argon` with free trial credits.
+  - **Anthropic Claude 5.x Tier**: `claude-opus-5.5` (Deep Reasoning Flagship), `claude-sonnet-5.5` (Coding Workhorse), `claude-fable-5.1` (Mythos Class Frontier), and `claude-haiku-5.5` (Fast Everyday).
+  - **OpenAI GPT-6 Tier**: `gpt-6-astra` (Flagship Software Engineering), `gpt-6.1-sol` (Heavy Coding), and `gpt-6-luna` (Fast Everyday).
+- 💎 **Apple-Grade Glassmorphic UI**:
+  - macOS Sonoma / visionOS inspired frosted glass surfaces and specular highlights.
+  - High-contrast typography with instant Dark / Light mode switching.
+  - Zero cheap emojis — 100% crisp vector SVG icons throughout the interface.
 
 ---
 
-## 🎁 How to Get $300 (₹26,000 INR) Free Credits on Google Cloud
+## 🤖 Full Autonomous Workspace Tools
 
-Google Cloud provides **$300 USD (approx. ₹26,000 INR)** in 100% free credits for 90 days to any new Google Cloud account. Follow these steps to claim yours:
+The agent has complete autonomous access to your project workspace through 7 non-destructive tools:
+
+| Tool | Capabilities |
+| :--- | :--- |
+| `read_file` | Reads any file with line-number precision and range slicing. |
+| `write_file` | Creates or updates files with automatic parent directory generation. |
+| `edit_file` | Surgical search-and-replace refactoring. |
+| `list_dir` | Explores directories and inspects folder structures. |
+| `get_workspace_structure` | Maps recursive project architecture and file trees. |
+| `search_code` | Ultra-fast regex and symbol searching across the entire repository. |
+| `run_command` | Executes terminal commands: unit tests (`pytest`, `npm test`), linters, builds, and git operations. |
+
+🛡️ **Zero-Loss Safety Net**: The extension automatically creates a `.argon_bak` backup before modifying or overwriting any existing file.
+
+---
+
+## 🖥️ Claude Desktop & Codex MCP Integration
+
+You can use the **Gemini 4 Argon MCP Server** directly in **Claude Desktop**, **Claude Code**, or **Codex** to let Claude consult Gemini 4 Argon or run workspace tools autonomously!
+
+### 1. Claude Desktop Setup
+Open your Claude Desktop configuration file:
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+Add the `gemini-4-argon` MCP server configuration:
+
+```json
+{
+  "mcpServers": {
+    "gemini-4-argon": {
+      "command": "node",
+      "args": [
+        "D:/ALL CAREER COURSE/LuckNexa/Gemini 4 Argon/lucknexa.gemini-4-argon-1.0.0/mcp/server.js"
+      ],
+      "env": {
+        "GEMINI_PROJECT_ID": "planar-hangout-510114-u1",
+        "GEMINI_LOCATION": "global",
+        "GEMINI_AUTH_METHOD": "adc"
+      }
+    }
+  }
+}
+```
+
+> **Note**: Adjust the path in `args` to match the exact location of `mcp/server.js` on your machine.
+
+### 2. Available MCP Tools in Claude / Codex
+Once configured, Claude or Codex can invoke:
+- `gemini_4_argon_reason`: Consult Google's flagship Gemini 4 Argon reasoning model for deep architectural analysis and complex debugging.
+- `read_file`, `write_file`, `edit_file`, `list_dir`, `get_workspace_structure`, `search_code`, `run_command`: Directly inspect, edit, and test your codebase!
+
+---
+
+## 🎁 How to Claim $300 (₹26,000 INR) Free Credits on Google Cloud
+
+Google Cloud offers **$300 USD (approx. ₹26,000 INR)** in 100% free credits for 90 days to any new Google Cloud account. Follow these steps to activate your free tier:
 
 1. **Visit the Free Trial Page**:
-   - Open [https://cloud.google.com/free](https://cloud.google.com/free) in your web browser.
+   - Open [https://cloud.google.com/free](https://cloud.google.com/free) in your browser.
 2. **Sign In**:
    - Click **"Get started for free"** and sign in with your Google account.
 3. **Account & Verification**:
    - Select your Country.
    - Enter your name and address.
    - Add a credit/debit card for standard identity verification.
-   - *Security Note:* Google will only run a temporary refundable verification check (₹2 in India / $1 USD) and immediately refunds it. **Google will NEVER automatically charge your card after the free trial ends** unless you explicitly choose to upgrade to a paid account.
+   - *Security Note:* Google only runs a temporary refundable verification check (₹2 in India / $1 USD) and immediately refunds it. **Google will NEVER automatically charge your card after the free trial ends** unless you explicitly choose to upgrade to a paid account.
 4. **Welcome Credits Activated**:
-   - Once verified, your account instantly receives **$300 USD credit (valid for 90 days)**!
+   - Once verified, your account immediately receives **$300 USD credit (valid for 90 days)**!
 
 ---
 
-## ⚡ Setup: What You Need from Google Cloud
+## ⚡ Google Cloud Setup: What You Need
 
 To run Gemini 4 Argon, you only need **two things**:
 1. Your **Google Cloud Project ID**
@@ -73,7 +123,7 @@ To run Gemini 4 Argon, you only need **two things**:
 
 ### Step 2: Copy Your Project ID
 1. In the Google Cloud Console top navigation bar, click on the project dropdown (next to "Google Cloud").
-2. Copy your **Project ID** (e.g. `my-gemini-project-12345`). You will paste this into the extension settings.
+2. Copy your **Project ID** (e.g. `planar-hangout-510114-u1`). Paste this into the extension settings.
 
 ---
 
@@ -145,47 +195,25 @@ To ensure you never accidentally spend more than your free credits:
 ## 📦 Installation Guide
 
 ### Method 1: 1-Click Installer (Windows)
-Double-click **`INSTALL.bat`** inside this repository folder! It automatically deploys the extension directly into Antigravity IDE and VS Code.
+Double-click **`INSTALL.bat`** inside this repository folder! It automatically compiles and installs the extension directly into Antigravity IDE and VS Code.
 
 ### Method 2: Install via GUI (Antigravity IDE or VS Code)
 1. Open Antigravity IDE or VS Code.
 2. Press `Ctrl + Shift + P` (or `Cmd + Shift + P` on macOS).
 3. Type and select: **`Extensions: Install from VSIX...`**.
-4. Select `gemini-4-argon-1.0.0.vsix` from this folder.
+4. Select `gemini-4-argon-1.1.0.vsix` from this folder.
 5. Reload window (`Developer: Reload Window`).
 
 ### Method 3: Command Line Installation
-Open your terminal in the directory where `gemini-4-argon-1.0.0.vsix` is located:
+Open your terminal in the directory where `gemini-4-argon-1.1.0.vsix` is located:
 
 ```bash
 # For Antigravity IDE:
-antigravity-ide --install-extension ./gemini-4-argon-1.0.0.vsix
+antigravity-ide --install-extension ./gemini-4-argon-1.1.0.vsix
 
 # For standard VS Code:
-code --install-extension ./gemini-4-argon-1.0.0.vsix
+code --install-extension ./gemini-4-argon-1.1.0.vsix
 ```
-
----
-
-## 🎮 How to Use
-
-1. **Open the Agent**:
-   - Click the glowing **Gemini 4 Argon** icon in the left Activity Bar.
-   - Or press `Ctrl + Shift + P` and search: `Gemini 4 Argon: Open Gemini 4 Argon Agent`.
-2. **Select Reasoning Level**:
-   - Choose **⚡ Low (Eco)**, **⚖️ Medium**, or **🧠 High (Deep)** right above the input bar based on task complexity.
-3. **Execute Autonomous Tasks**:
-   - Click Quick Action chips in the welcome card:
-     - **Audit Project**: Scans workspace architecture, inspects key modules, finds bugs & technical debt, and suggests actionable fixes.
-     - **Audit File**: Inspects the currently active editor file and suggests refactorings.
-     - **Run Tests**: Executes test suites in the workspace and explains failures.
-     - **Map Tree**: Generates an architectural tree of the workspace.
-   - Or assign any complex task:
-     - *"Audit `api/main.py` for potential race conditions and performance bottlenecks."*
-     - *"Run `npm test` and fix failing assertions in `tests/auth.test.ts`."*
-4. **Chat History & Sessions**:
-   - Click the **🕒 History** icon in the header to open the Saved Conversations drawer.
-   - Switch between conversations or click **+ New Chat** anytime.
 
 ---
 
@@ -194,7 +222,7 @@ code --install-extension ./gemini-4-argon-1.0.0.vsix
 **Lucky Kuntal**
 - **GitHub**: [@ffzlucky7-coder](https://github.com/ffzlucky7-coder)
 - **Repository**: [https://github.com/ffzlucky7-coder/gemini-4-argon](https://github.com/ffzlucky7-coder/gemini-4-argon)
-- **Created for**: Antigravity IDE & VS Code
+- **Created for**: Antigravity IDE, VS Code, Claude Desktop & Codex
 
 ---
 

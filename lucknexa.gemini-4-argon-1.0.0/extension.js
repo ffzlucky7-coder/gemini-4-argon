@@ -1,10 +1,12 @@
 /**
  * extension.js
  * Main entry point for the Gemini 4 Argon Autonomous Agent Extension.
- * Creator: Lucky Kuntal
+ * Creator: Lucky Kuntal (https://github.com/ffzlucky7-coder)
  * Features:
  *  - Persistent Multi-Session Chat History & Memory
  *  - Autonomous Workspace Tools & Terminal Execution
+ *  - Multimodal Media & File Attachment Support (Images, Audio, PDF, Code)
+ *  - Multi-Provider Adapter (Gemini 4 Argon, Claude 5.x, GPT-6)
  *  - Adaptive Thinking Mode (Low / Medium / High)
  *  - Universal GCP Multi-Auth (ADC, Service Account, API Key)
  */
@@ -13,7 +15,7 @@ const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs');
 const { GeminiAgent } = require('./agentLoop');
-const { testConnection, getAdcFilePath } = require('./authProvider');
+const { getAdcFilePath, getAuthHeaders } = require('./authProvider');
 
 const SESSIONS_STORAGE_KEY = 'gemini4argon_sessions_store_v1';
 const CURRENT_SESSION_ID_KEY = 'gemini4argon_active_session_id';
@@ -28,7 +30,11 @@ function getExtensionConfig() {
     thinkingLevel: cfg.get('thinkingLevel') || 'high',
     authMethod: cfg.get('authMethod') || 'adc',
     serviceAccountKeyPath: cfg.get('serviceAccountKeyPath') || '',
-    apiKey: cfg.get('apiKey') || ''
+    apiKey: cfg.get('apiKey') || '',
+    provider: cfg.get('provider') || 'vertex',
+    modelId: cfg.get('modelId') || 'gemini-4-argon',
+    claudeApiKey: cfg.get('claudeApiKey') || '',
+    openAiApiKey: cfg.get('openAiApiKey') || ''
   };
 }
 
@@ -41,7 +47,9 @@ function getStoredSessions(context) {
       createdAt: Date.now(),
       updatedAt: Date.now(),
       messages: [],
-      thinkingLevel: 'high'
+      thinkingLevel: 'high',
+      provider: 'vertex',
+      modelId: 'gemini-4-argon'
     };
     sessions = [initialSession];
     context.globalState.update(SESSIONS_STORAGE_KEY, sessions);
@@ -60,6 +68,88 @@ function getActiveSessionId(context) {
 
 function setActiveSessionId(context, id) {
   return context.globalState.update(CURRENT_SESSION_ID_KEY, id);
+}
+
+async function testConnectionMulti(config) {
+  const provider = (config.provider || 'vertex').toLowerCase();
+
+  if (provider === 'claude') {
+    const key = config.claudeApiKey || process.env.ANTHROPIC_API_KEY;
+    if (!key) return { success: false, message: 'Anthropic API key required.' };
+    const start = Date.now();
+    try {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: config.modelId || 'claude-opus-5.5',
+          max_tokens: 10,
+          messages: [{ role: 'user', content: 'Ping' }]
+        })
+      });
+      const latency = Date.now() - start;
+      if (resp.ok) {
+        return { success: true, message: `Connected to Claude (${config.modelId || 'claude-opus-5.5'})`, latencyMs: latency };
+      }
+      return { success: false, message: `Claude API returned HTTP ${resp.status}` };
+    } catch (err) {
+      return { success: false, message: err.message };
+    }
+  } else if (provider === 'openai') {
+    const key = config.openAiApiKey || process.env.OPENAI_API_KEY;
+    if (!key) return { success: false, message: 'OpenAI API key required.' };
+    const start = Date.now();
+    try {
+      const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${key}`
+        },
+        body: JSON.stringify({
+          model: config.modelId || 'gpt-6-astra',
+          max_tokens: 10,
+          messages: [{ role: 'user', content: 'Ping' }]
+        })
+      });
+      const latency = Date.now() - start;
+      if (resp.ok) {
+        return { success: true, message: `Connected to OpenAI (${config.modelId || 'gpt-6-astra'})`, latencyMs: latency };
+      }
+      return { success: false, message: `OpenAI API returned HTTP ${resp.status}` };
+    } catch (err) {
+      return { success: false, message: err.message };
+    }
+  } else {
+    // Vertex AI
+    const startTime = Date.now();
+    try {
+      const headers = await getAuthHeaders(config);
+      const projectId = config.projectId || 'planar-hangout-510114-u1';
+      const location = config.location || 'global';
+      const url = `https://aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/gemini-4-argon:generateContent`;
+      const resp = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: 'Respond with OK' }] }],
+          generationConfig: { maxOutputTokens: 10, thinkingConfig: { thinkingLevel: 'low' } }
+        })
+      });
+      const latency = Date.now() - startTime;
+      if (resp.ok) {
+        return { success: true, message: 'Successfully connected to Gemini 4 Argon!', latencyMs: latency };
+      }
+      const err = await resp.text();
+      return { success: false, message: `Vertex AI error: ${err}` };
+    } catch (err) {
+      return { success: false, message: err.message };
+    }
+  }
 }
 
 class GeminiChatViewProvider {
@@ -97,30 +187,21 @@ class GeminiChatViewProvider {
       switch (message.type) {
         case 'getInitialState': {
           const adcFile = getAdcFilePath();
-
-          // Sync agent's memory with active session
-          if (activeSession && activeSession.messages && activeSession.messages.length > 0) {
-            currentAgent.history = activeSession.messages.map(m => ({
-              role: m.role,
-              parts: [{ text: m.content }]
-            }));
-          } else {
-            currentAgent.clearHistory();
-          }
+          const adcDetected = !!adcFile;
 
           webview.postMessage({
             type: 'initState',
             config: getExtensionConfig(),
-            workspaceRoot: workspaceRoot,
-            adcDetected: Boolean(adcFile),
-            adcPath: adcFile || 'Not detected',
+            adcDetected: adcDetected,
+            adcPath: adcFile || '',
             sessions: sessions.map(s => ({
               id: s.id,
               title: s.title,
               createdAt: s.createdAt,
               updatedAt: s.updatedAt,
               messageCount: (s.messages || []).length,
-              thinkingLevel: s.thinkingLevel || 'high'
+              thinkingLevel: s.thinkingLevel || 'high',
+              provider: s.provider || 'vertex'
             })),
             currentSession: activeSession
           });
@@ -128,8 +209,10 @@ class GeminiChatViewProvider {
         }
 
         case 'sendMessage': {
-          if (!message.text || !message.text.trim()) return;
-          const userPrompt = message.text.trim();
+          const hasText = message.text && message.text.trim().length > 0;
+          const attachments = message.attachments || [];
+          if (!hasText && attachments.length === 0) return;
+          const userPrompt = hasText ? message.text.trim() : 'Inspect the attached file(s) and provide analysis.';
           const thinkingLevel = message.thinkingLevel || activeSession.thinkingLevel || 'high';
 
           currentAgent.updateConfig({ thinkingLevel });
@@ -138,6 +221,7 @@ class GeminiChatViewProvider {
           activeSession.messages.push({
             role: 'user',
             content: userPrompt,
+            attachments: attachments,
             timestamp: Date.now()
           });
 
@@ -157,7 +241,7 @@ class GeminiChatViewProvider {
               responseText = evt.content;
             }
             webview.postMessage(evt);
-          });
+          }, attachments);
 
           if (responseText) {
             activeSession.messages.push({
@@ -192,7 +276,8 @@ class GeminiChatViewProvider {
             createdAt: Date.now(),
             updatedAt: Date.now(),
             messages: [],
-            thinkingLevel: getExtensionConfig().thinkingLevel || 'high'
+            thinkingLevel: getExtensionConfig().thinkingLevel || 'high',
+            provider: getExtensionConfig().provider || 'vertex'
           };
           sessions.unshift(newSession);
           await saveStoredSessions(this.context, sessions);
@@ -219,14 +304,15 @@ class GeminiChatViewProvider {
           const target = sessions.find(s => s.id === message.sessionId);
           if (target) {
             await setActiveSessionId(this.context, target.id);
-            if (target.messages && target.messages.length > 0) {
-              currentAgent.history = target.messages.map(m => ({
+            currentAgent.clearHistory();
+            currentAgent.updateConfig({ thinkingLevel: target.thinkingLevel || 'high' });
+
+            target.messages.forEach(m => {
+              currentAgent.history.push({
                 role: m.role,
                 parts: [{ text: m.content }]
-              }));
-            } else {
-              currentAgent.clearHistory();
-            }
+              });
+            });
 
             webview.postMessage({
               type: 'sessionSwitched',
@@ -337,7 +423,7 @@ class GeminiChatViewProvider {
         }
 
         case 'saveConfig': {
-          const newCfg = message.config;
+          const newCfg = message.config || {};
           const configTarget = vscode.ConfigurationTarget.Global;
           const vsCfg = vscode.workspace.getConfiguration('gemini4Argon');
           if (newCfg.projectId) await vsCfg.update('projectId', newCfg.projectId, configTarget);
@@ -346,37 +432,43 @@ class GeminiChatViewProvider {
           if (newCfg.authMethod) await vsCfg.update('authMethod', newCfg.authMethod, configTarget);
           if (newCfg.serviceAccountKeyPath !== undefined) await vsCfg.update('serviceAccountKeyPath', newCfg.serviceAccountKeyPath, configTarget);
           if (newCfg.apiKey !== undefined) await vsCfg.update('apiKey', newCfg.apiKey, configTarget);
+          if (newCfg.provider !== undefined) await vsCfg.update('provider', newCfg.provider, configTarget);
+          if (newCfg.modelId !== undefined) await vsCfg.update('modelId', newCfg.modelId, configTarget);
+          if (newCfg.claudeApiKey !== undefined) await vsCfg.update('claudeApiKey', newCfg.claudeApiKey, configTarget);
+          if (newCfg.openAiApiKey !== undefined) await vsCfg.update('openAiApiKey', newCfg.openAiApiKey, configTarget);
 
           currentAgent.updateConfig(getExtensionConfig());
           webview.postMessage({
             type: 'configSaved',
             config: getExtensionConfig()
           });
-          vscode.window.showInformationMessage('Gemini 4 Argon configuration updated.');
+          vscode.window.showInformationMessage('Configuration updated successfully.');
           break;
         }
 
         case 'testConnection': {
           const cfg = message.config || getExtensionConfig();
           webview.postMessage({ type: 'testingConnection' });
-          const res = await testConnection(cfg);
+          const res = await testConnectionMulti(cfg);
           webview.postMessage({
-            type: 'testConnectionResult',
-            result: res
+            type: 'connectionTestResult',
+            success: res.success,
+            message: res.message,
+            latencyMs: res.latencyMs
           });
           break;
         }
 
         case 'selectKeyFile': {
-          const fileUris = await vscode.window.showOpenDialog({
+          const files = await vscode.window.showOpenDialog({
             canSelectMany: false,
-            openLabel: 'Select Service Account JSON Key',
+            openLabel: 'Select Service Account Key',
             filters: { 'JSON Files': ['json'] }
           });
-          if (fileUris && fileUris[0]) {
+          if (files && files.length > 0) {
             webview.postMessage({
               type: 'keyFileSelected',
-              path: fileUris[0].fsPath
+              path: files[0].fsPath
             });
           }
           break;
@@ -385,27 +477,22 @@ class GeminiChatViewProvider {
     });
   }
 
-  sendPrompt(prompt) {
-    if (this.view) {
-      this.view.show(true);
-      this.view.webview.postMessage({
-        type: 'externalPrompt',
-        prompt: prompt
-      });
-    }
-  }
-
   getHtmlForWebview(webview) {
-    const mediaPath = path.join(this.context.extensionPath, 'media');
-    const styleUri = webview.asWebviewUri(vscode.Uri.file(path.join(mediaPath, 'main.css')));
-    const scriptUri = webview.asWebviewUri(vscode.Uri.file(path.join(mediaPath, 'main.js')));
-    const iconUri = webview.asWebviewUri(vscode.Uri.file(path.join(mediaPath, 'icon.svg')));
+    const scriptUri = webview.asWebviewUri(
+      vscode.Uri.file(path.join(this.context.extensionPath, 'media', 'main.js'))
+    );
+    const styleUri = webview.asWebviewUri(
+      vscode.Uri.file(path.join(this.context.extensionPath, 'media', 'main.css'))
+    );
+    const iconUri = webview.asWebviewUri(
+      vscode.Uri.file(path.join(this.context.extensionPath, 'media', 'icon.svg'))
+    );
 
-    const htmlPath = path.join(mediaPath, 'main.html');
+    const htmlPath = path.join(this.context.extensionPath, 'media', 'main.html');
     let html = fs.readFileSync(htmlPath, 'utf8');
 
-    html = html.replace(/{{styleUri}}/g, styleUri.toString());
     html = html.replace(/{{scriptUri}}/g, scriptUri.toString());
+    html = html.replace(/{{styleUri}}/g, styleUri.toString());
     html = html.replace(/{{iconUri}}/g, iconUri.toString());
 
     return html;
@@ -414,86 +501,65 @@ class GeminiChatViewProvider {
 
 function activate(context) {
   const provider = new GeminiChatViewProvider(context);
-
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider('gemini-4-argon.chatView', provider, {
       webviewOptions: { retainContextWhenHidden: true }
     })
   );
 
-  // Command: Open Chat
   context.subscriptions.push(
     vscode.commands.registerCommand('gemini-4-argon.openChat', () => {
-      vscode.commands.executeCommand('gemini-4-argon.chatView.focus');
+      vscode.commands.executeCommand('workbench.view.extension.gemini-4-argon-container');
     })
   );
 
-  // Command: Audit Workspace
   context.subscriptions.push(
     vscode.commands.registerCommand('gemini-4-argon.auditWorkspace', () => {
-      const prompt = 'Please perform a comprehensive autonomous audit of this workspace. First use get_workspace_structure and list_dir to discover the architecture, then inspect key files, identify technical debt, bugs, performance bottlenecks, and security considerations, and provide an actionable remediation roadmap.';
-      provider.sendPrompt(prompt);
+      vscode.commands.executeCommand('workbench.view.extension.gemini-4-argon-container');
+      if (provider.view) {
+        provider.view.webview.postMessage({
+          type: 'externalPrompt',
+          prompt: 'Audit the full workspace for bugs, security vulnerabilities, and architectural bottlenecks.'
+        });
+      }
     })
   );
 
-  // Command: Audit Current File
   context.subscriptions.push(
     vscode.commands.registerCommand('gemini-4-argon.auditCurrentFile', () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) {
-        vscode.window.showWarningMessage('No active file open to audit.');
+        vscode.window.showWarningMessage('No active editor file to audit.');
         return;
       }
-      const filePath = editor.document.uri.fsPath;
-      const workspaceFolders = vscode.workspace.workspaceFolders;
-      const relPath = workspaceFolders ? path.relative(workspaceFolders[0].uri.fsPath, filePath) : filePath;
-      const prompt = `Please perform a thorough audit and deep code review of the active file "${relPath}". Use read_file to inspect it, verify edge cases, type safety, algorithmic efficiency, and suggest precise improvements or refactoring.`;
-      provider.sendPrompt(prompt);
+      const filename = path.basename(editor.document.fileName);
+      vscode.commands.executeCommand('workbench.view.extension.gemini-4-argon-container');
+      if (provider.view) {
+        provider.view.webview.postMessage({
+          type: 'externalPrompt',
+          prompt: `Audit the file "${filename}" for logic issues, performance improvements, and edge-case testing.`
+        });
+      }
     })
   );
 
-  // Command: Configure Credentials
   context.subscriptions.push(
     vscode.commands.registerCommand('gemini-4-argon.configureCredentials', () => {
-      if (provider.view) {
-        provider.view.show(true);
-        provider.view.webview.postMessage({ type: 'openSettings' });
-      }
+      vscode.commands.executeCommand('workbench.view.extension.gemini-4-argon-container');
     })
   );
 
-  // Command: Open Setup & Free Credits Guide
   context.subscriptions.push(
     vscode.commands.registerCommand('gemini-4-argon.openGuide', () => {
-      if (provider.view) {
-        provider.view.show(true);
-        provider.view.webview.postMessage({ type: 'openGuide' });
-      }
-    })
-  );
-
-  // Sync config updates
-  context.subscriptions.push(
-    vscode.workspace.onDidChangeConfiguration((e) => {
-      if (e.affectsConfiguration('gemini4Argon')) {
-        const updated = getExtensionConfig();
-        if (currentAgent) currentAgent.updateConfig(updated);
-        if (provider.view) {
-          provider.view.webview.postMessage({
-            type: 'configUpdated',
-            config: updated
-          });
-        }
-      }
+      vscode.commands.executeCommand('workbench.view.extension.gemini-4-argon-container');
     })
   );
 }
 
 function deactivate() {
-  if (currentAgent) currentAgent.abort();
+  if (currentAgent) {
+    currentAgent.abort();
+  }
 }
 
-module.exports = {
-  activate,
-  deactivate
-};
+module.exports = { activate, deactivate };
