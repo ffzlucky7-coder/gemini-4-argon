@@ -5,6 +5,7 @@
 [![Author](https://img.shields.io/badge/Author-Lucky%20Kuntal-ff007f.svg?style=flat&logo=github)](https://github.com/ffzlucky7-coder)
 [![Release](https://img.shields.io/badge/Release-v1.1.0-00d2ff.svg)](https://github.com/ffzlucky7-coder/gemini-4-argon)
 [![MCP Protocol](https://img.shields.io/badge/MCP-JSON--RPC%202.0-10b981.svg)](https://modelcontextprotocol.io)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Engine](https://img.shields.io/badge/Engine-Google%20Vertex%20AI-4285F4.svg)](https://cloud.google.com/vertex-ai)
 [![Models](https://img.shields.io/badge/Models-Gemini%204%20Argon%20%7C%20Claude%20Opus%205.5%20%7C%20GPT--6-7f00ff.svg)](https://github.com/ffzlucky7-coder/gemini-4-argon)
 [![Attachments](https://img.shields.io/badge/Multimodal-Vision%20%2B%20Docs-f59e0b.svg)](#)
@@ -322,6 +323,16 @@ antigravity-ide --install-extension ./gemini-4-argon-1.1.0.vsix
 # For standard VS Code:
 code --install-extension ./gemini-4-argon-1.1.0.vsix
 ```
+
+---
+
+## 🤝 Contributing & Community Governance
+
+Contributions, bug reports, and feature suggestions are warmly welcomed!
+
+All pull requests are reviewed, verified, and merged exclusively by the project maintainer: **[Lucky Kuntal](https://github.com/ffzlucky7-coder)**.
+
+Please read our **[CONTRIBUTING.md](CONTRIBUTING.md)** and **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** for details on our code standards and pull request review process.
 
 ---
 
