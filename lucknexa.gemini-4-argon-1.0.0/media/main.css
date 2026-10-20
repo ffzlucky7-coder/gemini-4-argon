@@ -466,6 +466,66 @@ html, body {
 }
 
 /* User Message - Compact, Elevated VisionOS Surface */
+/* In-Stream Thinking & Processing Indicator */
+.thinking-bubble {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 10px 14px;
+  background: var(--surface-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  margin-top: 4px;
+  max-width: 90%;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  animation: messageEntrance var(--transition-standard);
+  align-self: flex-start;
+}
+
+.thinking-spinner-ring {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(115, 217, 255, 0.2);
+  border-top-color: var(--accent-primary);
+  border-right-color: var(--accent-secondary);
+  animation: spinnerRotate 0.75s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spinnerRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.thinking-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.thinking-text {
+  font-size: 12px;
+  font-weight: 550;
+  color: var(--text-primary);
+  letter-spacing: -0.1px;
+}
+
+.thinking-subtext {
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+body[data-theme="light"] .thinking-spinner-ring {
+  border-color: rgba(8, 126, 188, 0.18);
+  border-top-color: #087EBC;
+  border-right-color: #6559D9;
+}
+
 .message.user {
   align-self: flex-end;
   background: var(--surface-elevated);

@@ -11,6 +11,46 @@
   let activeSessionId = null;
   const activeToolPills = new Map();
 
+  // In-Stream Thinking Bubble Controller
+  let activeThinkingBubble = null;
+
+  function showThinkingBubble(title, subtitle) {
+    removeThinkingBubble();
+    if (!chatContainer) return;
+
+    activeThinkingBubble = document.createElement('div');
+    activeThinkingBubble.className = 'message model thinking-bubble';
+    activeThinkingBubble.innerHTML = `
+      <div class="thinking-spinner-ring" aria-hidden="true"></div>
+      <div class="thinking-content">
+        <span class="thinking-text">${escapeHtml(title || 'Gemini 4 Argon is thinking...')}</span>
+        <span class="thinking-subtext">${escapeHtml(subtitle || 'Analyzing workspace & synthesizing response')}</span>
+      </div>
+    `;
+    chatContainer.appendChild(activeThinkingBubble);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+
+  function updateThinkingBubble(title, subtitle) {
+    if (!activeThinkingBubble) {
+      showThinkingBubble(title, subtitle);
+      return;
+    }
+    const textEl = activeThinkingBubble.querySelector('.thinking-text');
+    const subEl = activeThinkingBubble.querySelector('.thinking-subtext');
+    if (textEl && title) textEl.textContent = title;
+    if (subEl && subtitle !== undefined) subEl.textContent = subtitle;
+    if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+
+  function removeThinkingBubble() {
+    if (activeThinkingBubble && activeThinkingBubble.parentNode) {
+      activeThinkingBubble.parentNode.removeChild(activeThinkingBubble);
+    }
+    activeThinkingBubble = null;
+  }
+
+
   // Primary Elements
   const chatContainer = document.getElementById('chatContainer');
   const welcomeCard = document.getElementById('welcomeCard');
