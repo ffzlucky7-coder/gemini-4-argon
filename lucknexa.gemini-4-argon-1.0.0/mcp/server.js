@@ -9,23 +9,14 @@ const readline = require('readline');
 const path = require('path');
 const fs = require('fs');
 
-// Import workspace tools
-const {
-  readFileTool,
-  writeFileTool,
-  editFileTool,
-  listDirTool,
-  getWorkspaceStructureTool,
-  searchCodeTool,
-  runCommandTool
-} = require('../tools');
-
-const { getAuthHeaders, getAdcFilePath } = require('../authProvider');
+// Import workspace tools executor
+const { executeTool } = require('../tools');
+const { getAuthHeaders } = require('../authProvider');
 
 const SERVER_NAME = 'gemini-4-argon-mcp';
 const SERVER_VERSION = '1.1.0';
 
-// Default configuration from environment or ADC
+// Default configuration from environment
 const config = {
   projectId: process.env.GEMINI_PROJECT_ID || process.env.GCP_PROJECT_ID || '',
   location: process.env.GEMINI_LOCATION || 'global',
@@ -34,7 +25,8 @@ const config = {
   apiKey: process.env.GEMINI_API_KEY || ''
 };
 
-const WORKSPACE_ROOT = process.cwd();
+// Configurable workspace root (defaults to env or current working directory)
+const WORKSPACE_ROOT = process.env.GEMINI_WORKSPACE_ROOT || process.env.WORKSPACE_ROOT || process.cwd();
 
 // MCP Tool Definitions
 const MCP_TOOLS = [
@@ -65,7 +57,8 @@ const MCP_TOOLS = [
       properties: {
         path: { type: 'string', description: 'Relative or absolute file path.' },
         startLine: { type: 'number', description: 'Optional 1-based start line number.' },
-        endLine: { type: 'number', description: 'Optional 1-based end line number.' }
+        endLine: { type: 'number', description: 'Optional 1-based end line number.' },
+        workspaceRoot: { type: 'string', description: 'Optional workspace directory path override.' }
       },
       required: ['path']
     }
@@ -77,7 +70,8 @@ const MCP_TOOLS = [
       type: 'object',
       properties: {
         path: { type: 'string', description: 'Relative or absolute file path.' },
-        content: { type: 'string', description: 'Full content to write.' }
+        content: { type: 'string', description: 'Full content to write.' },
+        workspaceRoot: { type: 'string', description: 'Optional workspace directory path override.' }
       },
       required: ['path', 'content']
     }
@@ -90,7 +84,8 @@ const MCP_TOOLS = [
       properties: {
         path: { type: 'string', description: 'File path.' },
         target: { type: 'string', description: 'Exact string block to find.' },
-        replacement: { type: 'string', description: 'Exact replacement string.' }
+        replacement: { type: 'string', description: 'Exact replacement string.' },
+        workspaceRoot: { type: 'string', description: 'Optional workspace directory path override.' }
       },
       required: ['path', 'target', 'replacement']
     }
@@ -101,7 +96,8 @@ const MCP_TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        path: { type: 'string', description: 'Directory path (defaults to workspace root).' }
+        path: { type: 'string', description: 'Directory path (defaults to workspace root).' },
+        workspaceRoot: { type: 'string', description: 'Optional workspace directory path override.' }
       }
     }
   },
@@ -111,7 +107,8 @@ const MCP_TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        maxDepth: { type: 'number', description: 'Maximum recursion depth (default: 4).' }
+        maxDepth: { type: 'number', description: 'Maximum recursion depth (default: 4).' },
+        workspaceRoot: { type: 'string', description: 'Optional workspace directory path override.' }
       }
     }
   },
@@ -122,19 +119,21 @@ const MCP_TOOLS = [
       type: 'object',
       properties: {
         query: { type: 'string', description: 'Search term or regex pattern.' },
-        fileExtension: { type: 'string', description: 'Optional extension filter (e.g. .js, .py).' }
+        fileExtension: { type: 'string', description: 'Optional extension filter (e.g. .js, .py).' },
+        workspaceRoot: { type: 'string', description: 'Optional workspace directory path override.' }
       },
       required: ['query']
     }
   },
   {
     name: 'run_command',
-    description: 'Execute shell commands, test suites (pytest, npm test), linters, and git inside the workspace.',
+    description: 'Execute shell commands, test suites (pytest, npm test, cargo), linters, and git inside the workspace.',
     inputSchema: {
       type: 'object',
       properties: {
         command: { type: 'string', description: 'Terminal command to execute.' },
-        timeoutSeconds: { type: 'number', description: 'Timeout in seconds (default: 60).' }
+        timeoutSeconds: { type: 'number', description: 'Timeout in seconds (default: 60).' },
+        workspaceRoot: { type: 'string', description: 'Optional workspace directory path override.' }
       },
       required: ['command']
     }
@@ -143,6 +142,10 @@ const MCP_TOOLS = [
 
 // Execute Gemini 4 Argon Direct Query
 async function callGemini4Argon(prompt, thinkingLevel = 'high') {
+  if (!config.projectId) {
+    throw new Error('GEMINI_PROJECT_ID is not configured. Please set GEMINI_PROJECT_ID in your MCP client environment settings.');
+  }
+
   const headers = await getAuthHeaders(config);
   const url = `https://aiplatform.googleapis.com/v1/projects/${config.projectId}/locations/${config.location}/publishers/google/models/gemini-4-argon:generateContent`;
 
@@ -209,44 +212,36 @@ async function handleMessage(request) {
       };
 
     case 'tools/call': {
-      const toolName = params?.name;
-      const toolArgs = params?.arguments || {};
+      const toolName = params?.name || params?.tool;
+      const toolArgs = params?.arguments || params?.input || {};
 
       try {
         let resultText = '';
 
         if (toolName === 'gemini_4_argon_reason') {
           resultText = await callGemini4Argon(toolArgs.prompt, toolArgs.thinkingLevel || 'high');
-        } else if (toolName === 'read_file') {
-          const res = readFileTool(toolArgs.path, toolArgs.startLine, toolArgs.endLine, WORKSPACE_ROOT);
-          resultText = res.content || JSON.stringify(res);
-        } else if (toolName === 'write_file') {
-          const res = writeFileTool(toolArgs.path, toolArgs.content, WORKSPACE_ROOT);
-          resultText = JSON.stringify(res);
-        } else if (toolName === 'edit_file') {
-          const res = editFileTool(toolArgs.path, toolArgs.target, toolArgs.replacement, WORKSPACE_ROOT);
-          resultText = JSON.stringify(res);
-        } else if (toolName === 'list_dir') {
-          const res = listDirTool(toolArgs.path, WORKSPACE_ROOT);
-          resultText = JSON.stringify(res, null, 2);
-        } else if (toolName === 'get_workspace_structure') {
-          const res = getWorkspaceStructureTool(WORKSPACE_ROOT, toolArgs.maxDepth || 4);
-          resultText = res.structure || JSON.stringify(res);
-        } else if (toolName === 'search_code') {
-          const res = searchCodeTool(toolArgs.query, toolArgs.fileExtension, WORKSPACE_ROOT);
-          resultText = JSON.stringify(res, null, 2);
-        } else if (toolName === 'run_command') {
-          const res = await runCommandTool(toolArgs.command, WORKSPACE_ROOT, toolArgs.timeoutSeconds || 60);
-          resultText = JSON.stringify(res, null, 2);
         } else {
-          return {
-            jsonrpc: '2.0',
-            id,
-            error: {
-              code: -32601,
-              message: `Unknown tool: ${toolName}`
-            }
-          };
+          // Normalize parameters across snake_case and camelCase
+          const normalizedArgs = { ...toolArgs };
+          if (toolArgs.startLine !== undefined && toolArgs.start_line === undefined) {
+            normalizedArgs.start_line = toolArgs.startLine;
+          }
+          if (toolArgs.endLine !== undefined && toolArgs.end_line === undefined) {
+            normalizedArgs.end_line = toolArgs.endLine;
+          }
+          if (toolArgs.maxDepth !== undefined && toolArgs.max_depth === undefined) {
+            normalizedArgs.max_depth = toolArgs.maxDepth;
+          }
+          if (toolArgs.fileExtension !== undefined && toolArgs.file_pattern === undefined) {
+            normalizedArgs.file_pattern = toolArgs.fileExtension;
+          }
+          if (toolArgs.timeoutSeconds !== undefined && toolArgs.timeout_ms === undefined) {
+            normalizedArgs.timeout_ms = toolArgs.timeoutSeconds * 1000;
+          }
+
+          const targetWorkspace = toolArgs.workspaceRoot || toolArgs.workspace_root || WORKSPACE_ROOT;
+          const toolResult = await executeTool(toolName, normalizedArgs, targetWorkspace);
+          resultText = typeof toolResult === 'string' ? toolResult : JSON.stringify(toolResult, null, 2);
         }
 
         return {
@@ -301,6 +296,8 @@ function start() {
     terminal: false
   });
 
+  process.stderr.write(`[Gemini 4 Argon MCP] Server started on stdio (v${SERVER_VERSION})\n`);
+
   rl.on('line', async (line) => {
     const trimmed = line.trim();
     if (!trimmed) return;
@@ -311,24 +308,23 @@ function start() {
       if (response) {
         process.stdout.write(JSON.stringify(response) + '\n');
       }
-    } catch (parseErr) {
-      process.stdout.write(JSON.stringify({
+    } catch (err) {
+      process.stderr.write(`[Gemini 4 Argon MCP Error] ${err.message}\n`);
+      const errorResponse = {
         jsonrpc: '2.0',
         id: null,
         error: {
           code: -32700,
-          message: `Parse error: ${parseErr.message}`
+          message: 'Parse error: invalid JSON'
         }
-      }) + '\n');
+      };
+      process.stdout.write(JSON.stringify(errorResponse) + '\n');
     }
   });
 
-  // Log startup to stderr (never pollute stdout which is reserved for JSON-RPC)
-  process.stderr.write(`[Gemini 4 Argon MCP] Server started on stdio (v${SERVER_VERSION})\n`);
+  rl.on('close', () => {
+    process.exit(0);
+  });
 }
 
-if (require.main === module) {
-  start();
-}
-
-module.exports = { handleMessage, MCP_TOOLS };
+start();

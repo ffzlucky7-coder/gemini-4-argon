@@ -4,7 +4,7 @@
 
 [![Author](https://img.shields.io/badge/Author-Lucky%20Kuntal-ff007f.svg?style=flat&logo=github)](https://github.com/ffzlucky7-coder)
 [![Release](https://img.shields.io/badge/Release-v1.1.0-00d2ff.svg)](https://github.com/ffzlucky7-coder/gemini-4-argon)
-[![MCP Server](https://img.shields.io/badge/MCP-JSON--RPC%202.0-10b981.svg)](https://modelcontextprotocol.io)
+[![MCP Protocol](https://img.shields.io/badge/MCP-JSON--RPC%202.0-10b981.svg)](https://modelcontextprotocol.io)
 [![Engine](https://img.shields.io/badge/Engine-Google%20Vertex%20AI-4285F4.svg)](https://cloud.google.com/vertex-ai)
 [![Models](https://img.shields.io/badge/Models-Gemini%204%20Argon%20%7C%20Claude%20Opus%205.5%20%7C%20GPT--6-7f00ff.svg)](https://github.com/ffzlucky7-coder/gemini-4-argon)
 [![Attachments](https://img.shields.io/badge/Multimodal-Vision%20%2B%20Docs-f59e0b.svg)](#)
@@ -12,27 +12,24 @@
 [![Design](https://img.shields.io/badge/UI-Apple--Grade%20Glass-818cf8.svg)](#)
 [![License](https://img.shields.io/badge/License-MIT-34d399.svg)](LICENSE)
 
-> Developed by **Lucky Kuntal**, **Gemini 4 Argon** is a frontier autonomous software engineering agent that runs natively inside **Antigravity IDE**, **VS Code**, **Claude Desktop**, and **Codex / Cursor**. It features native multimodal attachments, deep reasoning budgets, autonomous workspace modification tools with automatic backups, and seamless multi-model support across **Gemini 4 Argon**, **Claude Opus 5.5**, and **GPT-6 Astra**.
+> Developed by **Lucky Kuntal**, **Gemini 4 Argon** is a frontier autonomous software engineering agent that runs natively inside **Antigravity IDE**, **VS Code**, **Claude Desktop**, and **Codex / Cursor**. It is engineered to handle massive, complex enterprise codebases with zero errors, featuring deep recursive reasoning, safe file manipulation with automatic backups, terminal test execution, and native multimodal vision.
 
 ---
 
-## 🌟 What's New in v1.1.0
+## ⚡ What Makes Gemini 4 Argon Enterprise-Ready?
 
-- 📎 **Multimodal File & Media Attachments**:
-  - Drag-and-drop screenshots, architecture diagrams, UI mockups, or documents directly into the chat window.
-  - Native paperclip button supporting images (`PNG`, `JPEG`, `WEBP`, `GIF`), documents (`PDF`, `TXT`, `CSV`, `JSON`), and source code files.
-  - Real-time glass preview chips with file size badges and one-click removal.
-- 🔌 **Claude Desktop & Codex Native MCP Server (`mcp/server.js`)**:
-  - Full **Model Context Protocol (JSON-RPC 2.0)** server running over standard I/O (`stdio`).
-  - Gives **Claude Desktop**, **Claude Code**, **Cursor**, and **Codex** full autonomous access to all 7 workspace tools plus `gemini_4_argon_reason`.
-- 🧠 **Multi-Model Provider Adapter**:
-  - **Google Vertex AI (Default)**: Flagship `gemini-4-argon` with free trial credits.
-  - **Anthropic Claude 5.x Tier**: `claude-opus-5.5` (Deep Reasoning Flagship), `claude-sonnet-5.5` (Coding Workhorse), `claude-fable-5.1` (Mythos Class Frontier), and `claude-haiku-5.5` (Fast Everyday).
-  - **OpenAI GPT-6 Tier**: `gpt-6-astra` (Flagship Software Engineering), `gpt-6.1-sol` (Heavy Coding), and `gpt-6-luna` (Fast Everyday).
-- 💎 **Apple-Grade Glassmorphic UI**:
-  - macOS Sonoma / visionOS inspired frosted glass surfaces and specular highlights.
-  - High-contrast typography with instant Dark / Light mode switching.
-  - Zero cheap emojis — 100% crisp vector SVG icons throughout the interface.
+When working on complex projects (monorepos, microservices, 100,000+ line codebases), conventional AI coding tools fail due to memory limits, truncated diffs, or inability to inspect files and run tests. **Gemini 4 Argon** solves this completely:
+
+- 🏗️ **Large-Scale Repository Navigation**:
+  - `get_workspace_structure` automatically filters out bloat (`node_modules`, `.git`, `dist`, `__pycache__`) and delivers clean recursive trees up to configurable depth.
+  - `search_code` scans thousands of files in milliseconds with regex or keyword queries.
+  - `read_file` supports line-level window slicing (`start_line` to `end_line`) so even 10,000-line files can be inspected without token overflow.
+- 🛡️ **Zero-Loss Safety Net**:
+  - Every time `write_file` or `edit_file` touches an existing file, a timestamped snapshot is saved to `<file>.argon_bak`. If anything goes wrong, your original code is 100% safe.
+- 🧪 **Terminal Execution with High-Buffer Support**:
+  - `run_command` executes test suites (`pytest`, `npm test`, `cargo test`, `go test`), linters, and git commands with a 5MB buffer and custom timeout — allowing the agent to write code, test it, and self-heal in real-time.
+- 📎 **Native Multimodal Vision Engine**:
+  - Drop screenshots, UI Figma mockups, PDF architectural docs, or error logs directly into the composer (`📎`). Gemini 4 Argon processes visual data alongside your source code.
 
 ---
 
@@ -58,7 +55,7 @@ flowchart TD
 
     subgraph External_Clients ["External AI Workspaces"]
         ClaudeDesk["Claude Desktop / Claude Code"]
-        CodexCursor["OpenAI Codex / Cursor IDE"]
+        CodexCursor["OpenAI Codex / Cursor IDE / Windsurf"]
         ClaudeDesk <== "stdio (MCP)" ==> MCPEngine
         CodexCursor <== "stdio (MCP)" ==> MCPEngine
     end
@@ -78,16 +75,16 @@ flowchart TD
 
 ## 🖥️ Complete Setup Guide: Claude Desktop
 
-You can connect **Claude Desktop** directly to your local **Gemini 4 Argon MCP Server** so Claude gains full access to all 7 workspace tools and can consult Gemini 4 Argon for deep reasoning!
+Connect **Claude Desktop** directly to Gemini 4 Argon's local MCP server to give Claude autonomous powers to inspect, edit, and test your codebase!
 
 ### Step 1: Locate your Claude Desktop Config File
 - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`  
-  *(Shortcut: Press `Win + R`, paste `%APPDATA%\Claude`, and press Enter)*
+  *(Shortcut: Press `Win + R`, paste `%APPDATA%\Claude`, and hit Enter)*
 - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Linux**: `~/.config/Claude/claude_desktop_config.json`
 
-### Step 2: Add the Gemini 4 Argon MCP Server
-Open or create `claude_desktop_config.json` in any text editor, and add:
+### Step 2: Add the MCP Server Configuration
+Add the `gemini-4-argon` server entry:
 
 ```json
 {
@@ -100,28 +97,59 @@ Open or create `claude_desktop_config.json` in any text editor, and add:
       "env": {
         "GEMINI_PROJECT_ID": "<YOUR_GOOGLE_CLOUD_PROJECT_ID>",
         "GEMINI_LOCATION": "global",
-        "GEMINI_AUTH_METHOD": "adc"
+        "GEMINI_AUTH_METHOD": "adc",
+        "GEMINI_WORKSPACE_ROOT": "<PATH_TO_YOUR_PROJECT>"
       }
     }
   }
 }
 ```
 
-> **💡 Example Path**:
-> - If you cloned this repository into `C:\projects\gemini-4-argon`, set `args` to:
->   `"args": ["C:/projects/gemini-4-argon/mcp/server.js"]` (use forward slashes `/`).
-> - Replace `<YOUR_GOOGLE_CLOUD_PROJECT_ID>` with your own Google Cloud Project ID.
+> **💡 Example Configuration for Windows**:
+> If this repo is at `C:/tools/gemini-4-argon` and your active coding project is at `D:/my-web-app`:
+> ```json
+> {
+>   "mcpServers": {
+>     "gemini-4-argon": {
+>       "command": "node",
+>       "args": ["C:/tools/gemini-4-argon/mcp/server.js"],
+>       "env": {
+>         "GEMINI_PROJECT_ID": "my-gcp-project-123",
+>         "GEMINI_LOCATION": "global",
+>         "GEMINI_AUTH_METHOD": "adc",
+>         "GEMINI_WORKSPACE_ROOT": "D:/my-web-app"
+>       }
+>     }
+>   }
+> }
+> ```
+> *(Always use forward slashes `/` in paths inside JSON).*
 
 ### Step 3: Restart Claude Desktop
-Close Claude Desktop completely and reopen it. You will see a small **Hammer (`🛠️`) icon** at the bottom right indicating 8 tools are active:
+Close Claude Desktop completely and restart it. In the bottom right corner, you will see the **Hammer (`🛠️`)** icon with **8 active tools**:
 - `gemini_4_argon_reason`
 - `read_file`, `write_file`, `edit_file`
 - `list_dir`, `get_workspace_structure`
 - `search_code`, `run_command`
 
+Now in Claude, you can simply say:
+> *"Audit my project structure, inspect failing tests, and refactor any bugs you find."*  
+Claude will autonomously use the tools to read files, run tests, and fix issues!
+
 ---
 
-## 💻 Complete Setup Guide: OpenAI Codex / Cursor / Windsurf
+## 💻 Complete Setup Guide: Claude Code CLI
+
+If you use Anthropic's **Claude Code** command-line interface:
+
+```bash
+# Add the MCP server to Claude Code:
+claude mcp add gemini-4-argon node <ABSOLUTE_PATH_TO_GEMINI_4_ARGON>/mcp/server.js -e GEMINI_PROJECT_ID=<YOUR_PROJECT_ID>
+```
+
+---
+
+## ⚡ Complete Setup Guide: OpenAI Codex / Cursor / Windsurf
 
 You can use the exact same MCP Server in **Cursor**, **Windsurf**, or any **Codex MCP Client**:
 
@@ -129,11 +157,11 @@ You can use the exact same MCP Server in **Cursor**, **Windsurf**, or any **Code
 1. Open **Cursor Settings** (`Ctrl + ,` or `Cmd + ,`).
 2. Navigate to **Features** -> **MCP**.
 3. Click **+ Add New MCP Server**.
-4. Enter:
+4. Set:
    - **Name**: `gemini-4-argon`
    - **Type**: `command`
    - **Command**: `node <ABSOLUTE_PATH_TO_GEMINI_4_ARGON>/mcp/server.js`
-5. Alternatively, create or edit `.cursor/mcp.json` in your project root:
+5. Alternatively, create `.cursor/mcp.json` in your project root:
 
 ```json
 {
@@ -153,25 +181,22 @@ You can use the exact same MCP Server in **Cursor**, **Windsurf**, or any **Code
 }
 ```
 
-Now Cursor's Agent or Codex can autonomously inspect, write, refactor, and test your codebase!
-
 ---
 
 ## 🤖 Full Autonomous Workspace Tools Reference
 
 The agent has complete autonomous access to your project workspace through 7 non-destructive tools:
 
-| Tool | Capabilities |
-| :--- | :--- |
-| `read_file` | Reads any file with line-number precision and range slicing. |
-| `write_file` | Creates or updates files with automatic parent directory generation. |
-| `edit_file` | Surgical search-and-replace refactoring. |
-| `list_dir` | Explores directories and inspects folder structures. |
-| `get_workspace_structure` | Maps recursive project architecture and file trees. |
-| `search_code` | Ultra-fast regex and symbol searching across the entire repository. |
-| `run_command` | Executes terminal commands: unit tests (`pytest`, `npm test`), linters, builds, and git operations. |
-
-🛡️ **Zero-Loss Safety Net**: The extension automatically creates a `.argon_bak` backup before modifying or overwriting any existing file.
+| Tool | Capabilities | Parameter Flexibility |
+| :--- | :--- | :--- |
+| `read_file` | Reads UTF-8 file contents with line-number precision. | `path`, `startLine`, `endLine`, `workspaceRoot` |
+| `write_file` | Creates or overwrites files with automatic directory generation & `.argon_bak` backup. | `path`, `content`, `workspaceRoot` |
+| `edit_file` | Surgical search-and-replace refactoring with backup. | `path`, `target`, `replacement`, `workspaceRoot` |
+| `list_dir` | Explores directories and inspects folder sizes. | `path`, `workspaceRoot` |
+| `get_workspace_structure` | Maps recursive project trees, filtering build artifacts. | `maxDepth`, `workspaceRoot` |
+| `search_code` | Ultra-fast regex and symbol searching across the entire codebase. | `query`, `fileExtension`, `workspaceRoot` |
+| `run_command` | Executes terminal commands (`pytest`, `npm test`, `cargo`, `git`). | `command`, `timeoutSeconds`, `workspaceRoot` |
+| `gemini_4_argon_reason` | Direct deep reasoning consultation with Gemini 4 Argon. | `prompt`, `thinkingLevel` |
 
 ---
 
