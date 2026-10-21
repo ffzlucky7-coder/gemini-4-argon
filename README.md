@@ -57,11 +57,11 @@ All official brand marks are sourced in high-resolution SVG and PNG formats with
 
 <p align="center">
   <a href="https://svgl.app/directory/ai" target="_blank" title="Google Gemini (SVGL Directory)">
-    <img src="https://raw.githubusercontent.com/ffzlucky7-coder/gemini-4-argon/main/media/logos/gemini.png" width="70" height="70" alt="Google Gemini" />
+    <img src="https://raw.githubusercontent.com/ffzlucky7-coder/gemini-4-argon/main/media/logos/gemini.svg" width="70" height="70" alt="Google Gemini" />
   </a>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <a href="https://svgl.app/directory/ai" target="_blank" title="Anthropic Claude (SVGL Directory)">
-    <img src="https://raw.githubusercontent.com/ffzlucky7-coder/gemini-4-argon/main/media/logos/claude.png" width="70" height="70" alt="Anthropic Claude" />
+    <img src="https://raw.githubusercontent.com/ffzlucky7-coder/gemini-4-argon/main/media/logos/claude.svg" width="70" height="70" alt="Anthropic Claude" />
   </a>
 </p>
 <p align="center">
@@ -77,7 +77,7 @@ Gemini 4 Argon is powered by a **Universal Multi-Model Adapter**. You can run th
 ### 🌟 1. 100% Free Default Model (Out-of-the-Box)
 
 <p align="left">
-  <img src="https://raw.githubusercontent.com/ffzlucky7-coder/gemini-4-argon/main/media/logos/gemini.png" width="24" height="24" style="vertical-align: middle;" />
+  <img src="https://raw.githubusercontent.com/ffzlucky7-coder/gemini-4-argon/main/media/logos/gemini.svg" width="24" height="24" style="vertical-align: middle;" />
   <strong>&nbsp;Google Gemini 4 Argon (Vertex AI Global Endpoint)</strong>
 </p>
 
@@ -109,6 +109,21 @@ Easily switch between these top-tier frontier models anytime from the extension 
 ## ☁️ How to Run Latest Claude Models for 100% FREE on Vertex AI (Via $300 Credits)
 
 Anthropic is an official Google Cloud Model Garden partner. This means you can run the latest **Claude Opus 5.5, Claude Opus 5, Claude Opus 4.8, Claude Opus 4.7, and Claude Sonnet 5.5** using your **$300 (₹26,000 INR) Google Cloud Free Trial Credits** without paying Anthropic directly!
+
+### 💳 Zero-Cost Cloud Credits Architecture
+
+```mermaid
+flowchart LR
+    Dev["Developer Machine\n(gcloud ADC Login)"] --> ADC["Google Cloud ADC\nOAuth2 Bearer Token"]
+    ADC --> GCP["Google Cloud Project\n($300 / ₹26,000 INR Free Credits)"]
+    GCP --> MG1["Google Gemini 4 Argon\n(global endpoint)"]
+    GCP --> MG2["Anthropic Claude Opus 5.5 / 5 / 4.8\n(Vertex AI Model Garden rawPredict)"]
+    
+    style GCP fill:#10b981,stroke:#059669,stroke-width:2px,color:#ffffff
+    style Dev fill:#3b82f6,stroke:#2563eb,stroke-width:2px,color:#ffffff
+    style MG1 fill:#8b5cf6,stroke:#7c3aed,stroke-width:2px,color:#ffffff
+    style MG2 fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#ffffff
+```
 
 ### Step-by-Step Setup:
 
@@ -161,6 +176,65 @@ Google Cloud offers **$300 USD (approx. ₹26,000 INR)** in 100% free credits fo
 ---
 
 ## ✨ Core Capabilities & Architecture
+
+### 📐 System & Integration Architecture
+
+```mermaid
+flowchart TD
+    subgraph Clients ["IDE & AI Client Ecosystem"]
+        Antigravity["Antigravity IDE & VS Code Extension"]
+        ClaudeDesktop["Claude Desktop & Claude Code"]
+        CursorCodex["Cursor IDE, Windsurf & Codex"]
+    end
+
+    subgraph CoreAgent ["Gemini 4 Argon Core Engine (v1.1.0)"]
+        UI["Apple Glassmorphic UI\n(Dynamic Reasoning & File Previews)"]
+        Loop["Autonomous Agent Loop\n(Streaming + Auto-Recovery Backoff)"]
+        Tools["7 Autonomous Tools (.argon_bak)\n(read, write, edit, list, tree, search, run)"]
+        Adapter["Universal Multi-Model Adapter\n(ADC Free Credits Routing)"]
+        MCPServer["Standalone JSON-RPC 2.0 MCP Server\n(Stdio & HTTP/SSE Server)"]
+    end
+
+    subgraph FrontierAI ["Google Cloud Vertex AI & Model Garden"]
+        GeminiArgon["Google Gemini 4 Argon\n(100% Free via $300 Credits)"]
+        ClaudeGarden["Anthropic Claude on Model Garden\n(Opus 5.5 | Opus 5 | Opus 4.8 | Sonnet 5.5)"]
+    end
+
+    Antigravity <--> UI
+    UI <--> Loop
+    Loop <--> Tools
+    Loop <--> Adapter
+    ClaudeDesktop <--> MCPServer
+    CursorCodex <--> MCPServer
+    MCPServer <--> Tools
+    MCPServer <--> Adapter
+    Adapter <--> GeminiArgon
+    Adapter <--> ClaudeGarden
+```
+
+### 🔄 Multi-Turn Autonomous Tool Execution Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Developer
+    participant UI as Glassmorphic UI
+    participant Agent as Agent Execution Loop
+    participant Tools as Autonomous Tools
+    participant Vertex as Vertex AI / Model Garden
+
+    User->>UI: Submit Prompt + File Attachments
+    UI->>Agent: Stream Task & Workspace Context
+    Agent->>Vertex: Dispatch Deep Reasoning (High Thinking Budget)
+    Vertex-->>Agent: Return Thoughts + Autonomous Tool Call (e.g. edit_file)
+    Agent->>UI: Stream Live Tool Pill ("Editing src/auth.ts")
+    Agent->>Tools: Execute with Auto-Backup (.argon_bak)
+    Tools-->>Agent: Tool Result Output
+    Agent->>Vertex: Send Tool Result for Next Step
+    Vertex-->>Agent: Final Response & Code Delivery
+    Agent->>UI: Stream Markdown & File Links
+    UI-->>User: Visual Completion Notification
+```
 
 ### 🛠️ Autonomous Workspace Tools (Model Context Protocol)
 
