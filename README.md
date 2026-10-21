@@ -1,91 +1,206 @@
-# 🚀 Gemini 4 Argon Autonomous Agent for Antigravity IDE, VS Code, Claude & Codex
+<div align="center">
 
-### 👨‍💻 Created by [Lucky Kuntal](https://github.com/ffzlucky7-coder)
+# 🚀 Gemini 4 Argon
+### Autonomous Coding Agent for Antigravity IDE, VS Code, Claude & Codex
 
-[![Author](https://img.shields.io/badge/Author-Lucky%20Kuntal-ff007f.svg?style=flat&logo=github)](https://github.com/ffzlucky7-coder)
-[![Release](https://img.shields.io/badge/Release-v1.1.0-00d2ff.svg)](https://github.com/ffzlucky7-coder/gemini-4-argon)
-[![MCP Protocol](https://img.shields.io/badge/MCP-JSON--RPC%202.0-10b981.svg)](https://modelcontextprotocol.io)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![Engine](https://img.shields.io/badge/Engine-Google%20Vertex%20AI-4285F4.svg)](https://cloud.google.com/vertex-ai)
-[![Models](https://img.shields.io/badge/Models-Gemini%204%20Argon%20%7C%20Claude%20Opus%205.5%20%7C%20GPT--6-7f00ff.svg)](https://github.com/ffzlucky7-coder/gemini-4-argon)
-[![Attachments](https://img.shields.io/badge/Multimodal-Vision%20%2B%20Docs-f59e0b.svg)](#)
-[![IDE](https://img.shields.io/badge/IDE-Antigravity%20%7C%20VS%20Code%20%7C%20Claude%20%7C%20Codex-38bdf8.svg)](https://github.com/ffzlucky7-coder/gemini-4-argon)
-[![Design](https://img.shields.io/badge/UI-Apple--Grade%20Glass-818cf8.svg)](#)
-[![License](https://img.shields.io/badge/License-MIT-34d399.svg)](LICENSE)
+**Created with ❤️ by [Lucky Kuntal](https://github.com/ffzlucky7-coder)**
 
-> Developed by **Lucky Kuntal**, **Gemini 4 Argon** is a frontier autonomous software engineering agent that runs natively inside **Antigravity IDE**, **VS Code**, **Claude Desktop**, and **Codex / Cursor**. It is engineered to handle massive, complex enterprise codebases with zero errors, featuring deep recursive reasoning, safe file manipulation with automatic backups, terminal test execution, and native multimodal vision.
+[![Author](https://img.shields.io/badge/Author-Lucky%20Kuntal-ff007f.svg?style=for-the-badge&logo=github)](https://github.com/ffzlucky7-coder)
+[![Release](https://img.shields.io/badge/Release-v1.1.0-00d2ff.svg?style=for-the-badge)](https://github.com/ffzlucky7-coder/gemini-4-argon)
+[![MCP Protocol](https://img.shields.io/badge/MCP-JSON--RPC%202.0-10b981.svg?style=for-the-badge)](https://modelcontextprotocol.io)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](CONTRIBUTING.md)
+[![License](https://img.shields.io/badge/License-MIT-34d399.svg?style=for-the-badge)](LICENSE)
 
----
+<br/>
 
-## ⚡ What Makes Gemini 4 Argon Enterprise-Ready?
+[![Google Gemini](https://img.shields.io/badge/Google-Gemini%204%20Argon-8E75C2?style=for-the-badge&logo=googlegemini&logoColor=white)](#-supported-ai-models-free-vs-frontier)
+[![Anthropic Claude](https://img.shields.io/badge/Anthropic-Claude%20Opus%205.5-D97706?style=for-the-badge&logo=anthropic&logoColor=white)](#-supported-ai-models-free-vs-frontier)
+[![OpenAI](https://img.shields.io/badge/OpenAI-GPT--6%20Astra-10A37F?style=for-the-badge&logo=openai&logoColor=white)](#-supported-ai-models-free-vs-frontier)
 
-When working on complex projects (monorepos, microservices, 100,000+ line codebases), conventional AI coding tools fail due to memory limits, truncated diffs, or inability to inspect files and run tests. **Gemini 4 Argon** solves this completely:
+<br/>
 
-- 🏗️ **Large-Scale Repository Navigation**:
-  - `get_workspace_structure` automatically filters out bloat (`node_modules`, `.git`, `dist`, `__pycache__`) and delivers clean recursive trees up to configurable depth.
-  - `search_code` scans thousands of files in milliseconds with regex or keyword queries.
-  - `read_file` supports line-level window slicing (`start_line` to `end_line`) so even 10,000-line files can be inspected without token overflow.
-- 🛡️ **Zero-Loss Safety Net**:
-  - Every time `write_file` or `edit_file` touches an existing file, a timestamped snapshot is saved to `<file>.argon_bak`. If anything goes wrong, your original code is 100% safe.
-- 🧪 **Terminal Execution with High-Buffer Support**:
-  - `run_command` executes test suites (`pytest`, `npm test`, `cargo test`, `go test`), linters, and git commands with a 5MB buffer and custom timeout — allowing the agent to write code, test it, and self-heal in real-time.
-- 📎 **Native Multimodal Vision Engine**:
-  - Drop screenshots, UI Figma mockups, PDF architectural docs, or error logs directly into the composer (`📎`). Gemini 4 Argon processes visual data alongside your source code.
+[![Engine](https://img.shields.io/badge/Default%20Free%20Engine-Google%20Vertex%20AI-4285F4.svg?style=flat-square&logo=googlecloud)](https://cloud.google.com/vertex-ai)
+[![Attachments](https://img.shields.io/badge/Multimodal-Vision%20%2B%20Docs-f59e0b.svg?style=flat-square)](#-multimodal-attachments-vision--files)
+[![Platforms](https://img.shields.io/badge/Supported-Antigravity%20%7C%20VS%20Code%20%7C%20Claude%20%7C%20Cursor%20%7C%20Codex-38bdf8.svg?style=flat-square)](#-universal-compatibility--integrations)
+
+<p align="center">
+  <strong>Gemini 4 Argon</strong> is a frontier-grade, multi-platform autonomous software engineering agent.<br/>
+  It executes real-world coding tasks with deep reasoning, autonomous workspace tools, automatic safety backups, and native vision — running with 100% zero crashes across Antigravity IDE, VS Code, Claude Desktop, and Cursor / Codex.
+</p>
+
+</div>
 
 ---
 
-## 🏛️ System & MCP Architecture
+## 📑 Table of Contents
+
+- [🧠 Supported AI Models (Free vs Frontier)](#-supported-ai-models-free-vs-frontier)
+- [✨ Core Capabilities & Architecture](#-core-capabilities--architecture)
+- [📎 Multimodal Attachments (Vision & Files)](#-multimodal-attachments-vision--files)
+- [🔍 Pro Guide: How to Find Your Absolute Path](#-pro-guide-how-to-find-your-exact-absolute-path)
+- [🖥️ Setup Guide: Claude Desktop](#️-setup-guide-claude-desktop)
+- [💻 Setup Guide: Claude Code CLI](#-setup-guide-claude-code-cli)
+- [⚡ Setup Guide: Cursor IDE, Windsurf & Codex](#-setup-guide-cursor-ide-windsurf--codex)
+- [🎁 How to Claim $300 (₹26,000 INR) Google Cloud Free Trial](#-how-to-claim-300-26000-inr-free-credits-on-google-cloud)
+  - [💳 Important: ₹1,000 Refundable Verification Deposit](#-important-note-on-the-1000-refundable-verification-deposit)
+- [🔑 Google Cloud Setup & Auth Methods](#-google-cloud-setup--3-auth-methods)
+- [🛡️ 100% Zero-Cost Budget Alert Guard](#️-budget-alert-guard-100-zero-cost-safeguard)
+- [📦 Installation in Antigravity IDE & VS Code](#-installation-guide)
+- [🤝 Contributing & Community Governance](#-contributing--community-governance)
+- [👤 Author & License](#-author--creator)
+
+---
+
+## 🧠 Supported AI Models (Free vs Frontier)
+
+<p align="center">
+  <img src="https://cdn.simpleicons.org/googlegemini/8E75C2" width="60" height="60" alt="Google Gemini" />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://cdn.simpleicons.org/anthropic/D97706" width="60" height="60" alt="Anthropic Claude" />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://cdn.simpleicons.org/openai/10A37F" width="60" height="60" alt="OpenAI ChatGPT" />
+</p>
+
+Gemini 4 Argon is powered by a **Universal Multi-Model Adapter**. You can run the flagship **Google Gemini 4 Argon for 100% FREE** using trial credits, or plug in your own API key to tap into the latest frontier Claude and OpenAI models:
+
+### 🌟 1. 100% Free Default Model (Out-of-the-Box)
+
+<p align="left">
+  <img src="https://cdn.simpleicons.org/googlegemini/8E75C2" width="24" height="24" style="vertical-align: middle;" />
+  <strong>&nbsp;Google Gemini 4 Argon (Vertex AI Global Endpoint)</strong>
+</p>
+
+| Model | Provider | Cost | Capabilities |
+| :--- | :--- | :--- | :--- |
+| **`gemini-4-argon`** | **Google Vertex AI** | **100% FREE** *(via ₹26,000 / $300 credit)* | Google's Flagship deep reasoning, native multimodal vision, autonomous tool calling, 25-turn self-healing loop. |
+
+> **💡 Zero Subscription Needed:** Every new Google Cloud account gets **$300 (₹26,000 INR)** in credits, allowing you to use Gemini 4 Argon heavily for 90 days without paying a single rupee!
+
+---
+
+### 🚀 2. Frontier Multi-Model Engine (Bring Your Own Key)
+
+Easily switch to these frontier models anytime from the extension **⚙️ Settings**:
+
+#### <img src="https://cdn.simpleicons.org/anthropic/D97706" width="22" height="22" style="vertical-align: middle;" /> Anthropic Claude 5.x Tier
+| Model | Identifier | Purpose & Strength |
+| :--- | :--- | :--- |
+| **Claude Opus 5.5** | `claude-opus-5.5` | **Flagship Deep Reasoning**: Architectural system design, complex algorithmic logic, and repository-wide planning. |
+| **Claude Sonnet 5.5** | `claude-sonnet-5.5` | **Coding Workhorse**: Rapid, high-effort everyday coding, multi-file refactoring, and bug fixes. |
+| **Claude Fable 5.1** | `claude-fable-5.1` | **Mythos Class Frontier**: Advanced creative problem-solving and frontier exploration. |
+| **Claude Haiku 5.5** | `claude-haiku-5.5` | **Fast & Lightweight**: Instant responses, quick documentation, and micro-edits. |
+
+#### <img src="https://cdn.simpleicons.org/openai/10A37F" width="22" height="22" style="vertical-align: middle;" /> OpenAI GPT-6 Tier
+| Model | Identifier | Purpose & Strength |
+| :--- | :--- | :--- |
+| **GPT-6 Astra** | `gpt-6-astra` | **Flagship Software Engineering**: Advanced code synthesis, logic proofing, and full-stack building. |
+| **GPT-6.1 Sol** | `gpt-6.1-sol` | **Heavy Coding Tier**: High-volume refactoring, backend migrations, and code conversions. |
+| **GPT-6 Luna** | `gpt-6-luna` | **Everyday Iteration**: Quick script generation, code explanations, and linting. |
+
+---
+
+## ✨ Core Capabilities & Architecture
 
 ```mermaid
 flowchart TD
-    subgraph IDE_Extension ["Antigravity IDE / VS Code Extension"]
-        Webview["Apple-Grade Glassmorphic UI\n(Media Attachments + Dynamic Reasoning)"]
-        AgentLoop["Autonomous ReAct Loop\n(agentLoop.js)"]
-        Provider["Multi-Model Adapter\n(Vertex AI | Claude 5.x | GPT-6)"]
-        Webview <--> AgentLoop
-        AgentLoop <--> Provider
+    subgraph Clients ["Workspace Environments"]
+        Antigravity["Antigravity IDE & VS Code"]
+        ClaudeDesktop["Claude Desktop & Claude Code"]
+        CursorCodex["Cursor IDE, Windsurf & Codex"]
     end
 
-    subgraph MCP_Layer ["Model Context Protocol (MCP) Server"]
-        MCPEngine["Standalone JSON-RPC 2.0 Engine\n(mcp/server.js)"]
-        WorkspaceTools["7 Autonomous Workspace Tools\n(read, write, edit, list, tree, search, run)"]
-        ArgonTool["gemini_4_argon_reason\n(Direct Frontier Reasoning)"]
-        MCPEngine <--> WorkspaceTools
-        MCPEngine <--> ArgonTool
+    subgraph CoreEngine ["Gemini 4 Argon Core Subsystem"]
+        GlassUI["Apple-Grade Glassmorphic UI\n(Media Composer + Dynamic Reasoning)"]
+        MCPServer["Standalone JSON-RPC 2.0 MCP Server\n(mcp/server.js)"]
+        ProviderAdapter["Multi-Model Provider Adapter\n(Vertex AI | Claude 5.x | GPT-6)"]
+        WorkspaceTools["7 Autonomous Tools with Auto-Backup\n(read, write, edit, list, tree, search, run)"]
     end
 
-    subgraph External_Clients ["External AI Workspaces"]
-        ClaudeDesk["Claude Desktop / Claude Code"]
-        CodexCursor["OpenAI Codex / Cursor IDE / Windsurf"]
-        ClaudeDesk <== "stdio (MCP)" ==> MCPEngine
-        CodexCursor <== "stdio (MCP)" ==> MCPEngine
+    subgraph CloudAI ["AI Cloud Intelligence"]
+        VertexAI["Google Vertex AI\n(Gemini 4 Argon)"]
+        AnthropicAPI["Anthropic Messages API\n(Claude Opus 5.5)"]
+        OpenAIAPI["OpenAI API\n(GPT-6 Astra)"]
     end
 
-    subgraph Cloud_AI ["Cloud Intelligence Providers"]
-        VertexCloud["Google Vertex AI\n(gemini-4-argon)"]
-        AnthropicCloud["Anthropic API\n(claude-opus-5.5)"]
-        OpenAICloud["OpenAI API\n(gpt-6-astra)"]
-        Provider <--> VertexCloud
-        Provider <--> AnthropicCloud
-        Provider <--> OpenAICloud
-        ArgonTool <--> VertexCloud
-    end
+    Antigravity <--> GlassUI
+    GlassUI <--> ProviderAdapter
+    ClaudeDesktop <== "stdio (MCP)" ==> MCPEngine
+    CursorCodex <== "stdio (MCP)" ==> MCPEngine
+    MCPEngine <--> WorkspaceTools
+    ProviderAdapter <--> WorkspaceTools
+    ProviderAdapter <--> VertexAI
+    ProviderAdapter <--> AnthropicAPI
+    ProviderAdapter <--> OpenAIAPI
 ```
+
+### 🤖 The 7 Autonomous Workspace Tools
+
+| Tool | Capabilities & Safeguards |
+| :--- | :--- |
+| `read_file` | Line-number window slicing (`startLine` to `endLine`). Reads files up to 100,000+ lines without token overflow. |
+| `write_file` | Creates or overwrites files. Auto-generates missing folders and creates `.argon_bak` backup. |
+| `edit_file` | Surgical search-and-replace refactoring with backup preservation. |
+| `list_dir` | Explores directories and inspects folder sizes with recursive options. |
+| `get_workspace_structure` | Maps recursive project trees while automatically ignoring `node_modules`, `.git`, `dist`, `__pycache__`. |
+| `search_code` | Ultra-fast regex and symbol searching across the entire codebase. |
+| `run_command` | Executes terminal commands (`pytest`, `npm test`, `cargo`, `git`) with a generous **5 MB output buffer**. |
+| `gemini_4_argon_reason` | Direct deep reasoning consultation with Gemini 4 Argon inside Claude or Codex. |
 
 ---
 
-## 🖥️ Complete Setup Guide: Claude Desktop
+## 📎 Multimodal Attachments (Vision & Files)
 
-Connect **Claude Desktop** directly to Gemini 4 Argon's local MCP server to give Claude autonomous powers to inspect, edit, and test your codebase!
+Gemini 4 Argon v1.1.0 features native multimodal capability:
+1. **Paperclip Button (`📎`)**: Click the paperclip icon in the composer to select images, PDFs, or code files.
+2. **Drag & Drop Overlay**: Simply drag any image, UI mockup, or document into the chat window — a frosted glass dropzone appears.
+3. **Glass Preview Chips**: Attached files appear as compact pills with thumbnails, file size tags, and a 1-click remove button (`✕`).
+4. **Zero-Disk In-Memory Encoding**: Files are securely encoded in Base64 in memory and sent directly via `inlineData` to Vertex AI / Claude / OpenAI.
 
-### Step 1: Locate your Claude Desktop Config File
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`  
-  *(Shortcut: Press `Win + R`, paste `%APPDATA%\Claude`, and hit Enter)*
+---
+
+## 🔍 Pro Guide: How to Find Your Exact Absolute Path
+
+When setting up Claude Desktop or Codex, you need the absolute path to `mcp/server.js`. Here is the easiest way to find and copy it:
+
+### 🪟 On Windows (Easiest Method):
+1. Open File Explorer and navigate to the folder where you cloned or extracted `gemini-4-argon`.
+2. Open the `mcp` folder.
+3. Hold **`Shift`** on your keyboard, then **Right-Click** on `server.js`.
+4. Click **"Copy as path"**.
+5. When pasting into JSON, **replace backslashes `\` with forward slashes `/`**:
+   - *Copied:* `"C:\projects\gemini-4-argon\mcp\server.js"`
+   - *Converted for JSON:* `"C:/projects/gemini-4-argon/mcp/server.js"`
+
+### 💻 Inside VS Code or Antigravity IDE:
+1. In the left Explorer sidebar, expand the `mcp` folder.
+2. Right-click on `server.js` and select **"Copy Path"**.
+3. Paste it directly into your configuration.
+
+### 🍎 On macOS or Linux (Terminal):
+1. Open Terminal and `cd` into the repo's `mcp` directory.
+2. Run:
+   ```bash
+   pwd
+   ```
+3. Append `/server.js` to the output (e.g., `/Users/username/gemini-4-argon/mcp/server.js`).
+
+---
+
+## 🖥️ Setup Guide: Claude Desktop
+
+Connect **Claude Desktop** directly to Gemini 4 Argon so Claude can autonomously inspect, write, refactor, and test your projects!
+
+### Step 1: Open Your Claude Desktop Config File
+- **Windows**: Press `Win + R`, paste:
+  ```
+  %APPDATA%\Claude\claude_desktop_config.json
+  ```
+  and hit Enter (open with Notepad, VS Code, or any text editor).
 - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Linux**: `~/.config/Claude/claude_desktop_config.json`
 
-### Step 2: Add the MCP Server Configuration
-Add the `gemini-4-argon` server entry:
+### Step 2: Add the Configuration
+Add `gemini-4-argon` under `mcpServers`:
 
 ```json
 {
@@ -106,55 +221,47 @@ Add the `gemini-4-argon` server entry:
 }
 ```
 
-> **💡 Example Configuration for Windows**:
-> If this repo is at `C:/tools/gemini-4-argon` and your active coding project is at `D:/my-web-app`:
+> **💡 Real Example for Windows:**
 > ```json
 > {
 >   "mcpServers": {
 >     "gemini-4-argon": {
 >       "command": "node",
->       "args": ["C:/tools/gemini-4-argon/mcp/server.js"],
+>       "args": [
+>         "C:/projects/gemini-4-argon/mcp/server.js"
+>       ],
 >       "env": {
->         "GEMINI_PROJECT_ID": "my-gcp-project-123",
+>         "GEMINI_PROJECT_ID": "my-cool-project-12345",
 >         "GEMINI_LOCATION": "global",
 >         "GEMINI_AUTH_METHOD": "adc",
->         "GEMINI_WORKSPACE_ROOT": "D:/my-web-app"
+>         "GEMINI_WORKSPACE_ROOT": "D:/work/my-web-app"
 >       }
 >     }
 >   }
 > }
 > ```
-> *(Always use forward slashes `/` in paths inside JSON).*
 
 ### Step 3: Restart Claude Desktop
-Close Claude Desktop completely and restart it. In the bottom right corner, you will see the **Hammer (`🛠️`)** icon with **8 active tools**:
-- `gemini_4_argon_reason`
-- `read_file`, `write_file`, `edit_file`
-- `list_dir`, `get_workspace_structure`
-- `search_code`, `run_command`
-
-Now in Claude, you can simply say:
-> *"Audit my project structure, inspect failing tests, and refactor any bugs you find."*  
-Claude will autonomously use the tools to read files, run tests, and fix issues!
+Restart Claude Desktop. You will see a small **Hammer (`🛠️`)** icon in the bottom right with **8 active tools**:
+`gemini_4_argon_reason`, `read_file`, `write_file`, `edit_file`, `list_dir`, `get_workspace_structure`, `search_code`, `run_command`.
 
 ---
 
-## 💻 Complete Setup Guide: Claude Code CLI
+## 💻 Setup Guide: Claude Code CLI
 
-If you use Anthropic's **Claude Code** command-line interface:
+If you use Anthropic's **Claude Code** terminal tool:
 
 ```bash
-# Add the MCP server to Claude Code:
 claude mcp add gemini-4-argon node <ABSOLUTE_PATH_TO_GEMINI_4_ARGON>/mcp/server.js -e GEMINI_PROJECT_ID=<YOUR_PROJECT_ID>
 ```
 
 ---
 
-## ⚡ Complete Setup Guide: OpenAI Codex / Cursor / Windsurf
+## ⚡ Setup Guide: Cursor IDE, Windsurf & Codex
 
-You can use the exact same MCP Server in **Cursor**, **Windsurf**, or any **Codex MCP Client**:
+Use the exact same MCP Server inside **Cursor**, **Windsurf**, or **OpenAI Codex**:
 
-### In Cursor / Windsurf IDE:
+### Method A: Via Cursor Settings UI
 1. Open **Cursor Settings** (`Ctrl + ,` or `Cmd + ,`).
 2. Navigate to **Features** -> **MCP**.
 3. Click **+ Add New MCP Server**.
@@ -162,7 +269,9 @@ You can use the exact same MCP Server in **Cursor**, **Windsurf**, or any **Code
    - **Name**: `gemini-4-argon`
    - **Type**: `command`
    - **Command**: `node <ABSOLUTE_PATH_TO_GEMINI_4_ARGON>/mcp/server.js`
-5. Alternatively, create `.cursor/mcp.json` in your project root:
+
+### Method B: Via `.cursor/mcp.json`
+Create or edit `.cursor/mcp.json` in your project root:
 
 ```json
 {
@@ -182,22 +291,7 @@ You can use the exact same MCP Server in **Cursor**, **Windsurf**, or any **Code
 }
 ```
 
----
-
-## 🤖 Full Autonomous Workspace Tools Reference
-
-The agent has complete autonomous access to your project workspace through 7 non-destructive tools:
-
-| Tool | Capabilities | Parameter Flexibility |
-| :--- | :--- | :--- |
-| `read_file` | Reads UTF-8 file contents with line-number precision. | `path`, `startLine`, `endLine`, `workspaceRoot` |
-| `write_file` | Creates or overwrites files with automatic directory generation & `.argon_bak` backup. | `path`, `content`, `workspaceRoot` |
-| `edit_file` | Surgical search-and-replace refactoring with backup. | `path`, `target`, `replacement`, `workspaceRoot` |
-| `list_dir` | Explores directories and inspects folder sizes. | `path`, `workspaceRoot` |
-| `get_workspace_structure` | Maps recursive project trees, filtering build artifacts. | `maxDepth`, `workspaceRoot` |
-| `search_code` | Ultra-fast regex and symbol searching across the entire codebase. | `query`, `fileExtension`, `workspaceRoot` |
-| `run_command` | Executes terminal commands (`pytest`, `npm test`, `cargo`, `git`). | `command`, `timeoutSeconds`, `workspaceRoot` |
-| `gemini_4_argon_reason` | Direct deep reasoning consultation with Gemini 4 Argon. | `prompt`, `thinkingLevel` |
+Now Cursor's agent can autonomously use all 7 tools to inspect, write, refactor, and test your codebase!
 
 ---
 
@@ -210,35 +304,38 @@ Google Cloud offers **$300 USD (approx. ₹26,000 INR)** in 100% free credits fo
 2. **Sign In**:
    - Click **"Get started for free"** and sign in with your Google account.
 3. **Account & Verification**:
-   - Select your Country.
+   - Select your Country (e.g. India).
    - Enter your name and address.
    - Add a credit/debit card for standard identity verification.
-   - *Security Note:* Google only runs a temporary refundable verification check (₹2 in India / $1 USD) and immediately refunds it. **Google will NEVER automatically charge your card after the free trial ends** unless you explicitly choose to upgrade to a paid account.
-4. **Welcome Credits Activated**:
-   - Once verified, your account immediately receives **$300 USD credit (valid for 90 days)**!
 
 ---
 
-## ⚡ Google Cloud Setup: What Every User Needs
+### 💳 Important Note on the ₹1,000 Refundable Verification Deposit
 
-To run Gemini 4 Argon with your own Google Cloud account, you only need **two things**:
+> [!NOTE]
+> **Why is there a ₹1,000 charge during signup?**
+> - Under RBI (Reserve Bank of India) regulations and international payment security protocols, Google Cloud performs a **temporary pre-authorization charge of ₹1,000 INR** (or ₹2 depending on your card issuer) to confirm card authenticity.
+> - **100% REFUNDABLE**: This is **NOT** a fee. The amount is **immediately refunded back to your bank account / card** within minutes or a few business days!
+> - **No Automatic Billing**: Google Cloud explicitly guarantees that **your card will NEVER be charged automatically** when the free trial ends. To ever be charged, you would have to manually click an "Upgrade to Paid Account" button.
+> - You get the full **₹26,000 ($300 USD)** in trial credits to run Gemini 4 Argon!
+
+---
+
+## 🔑 Google Cloud Setup & 3 Auth Methods
+
+To connect Gemini 4 Argon with Google Cloud, you only need:
 1. Your own **Google Cloud Project ID**
-2. **Vertex AI API Enabled** + **One Credentials Method** (ADC, Service Account JSON, or API Key)
+2. **Vertex AI API Enabled** + **Any ONE of the 3 Credentials Methods below**
 
 ### Step 1: Enable Vertex AI API
 1. Open the [Google Cloud Console](https://console.cloud.google.com/).
-2. In the top search bar, type `Vertex AI API`.
-3. Select **Vertex AI API** from the results and click the blue **Enable** button.
+2. In the top search bar, type `Vertex AI API` and click **Enable**.
 
 ### Step 2: Copy Your Project ID
-1. In the Google Cloud Console top navigation bar, click on the project dropdown (next to "Google Cloud").
-2. Copy your **Project ID** (e.g. `your-project-id-here`). Paste this into the extension settings.
+1. In the top navbar, click on the project dropdown.
+2. Copy your **Project ID** (e.g. `my-company-project-12345`).
 
----
-
-## 🔑 Credentials Guide: 3 Easy Methods
-
-You only need **ONE** of the following three authentication options:
+### Step 3: Choose ANY 1 Auth Method:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
@@ -249,73 +346,49 @@ You only need **ONE** of the following three authentication options:
 └──────────────────────────┴─────────────────────────┴───────────────────┘
 ```
 
-### Option A: Application Default Credentials (ADC) — *Recommended for Developers*
-If you have the Google Cloud SDK (`gcloud`) installed:
-1. Open your terminal (PowerShell, Command Prompt, or Terminal).
-2. Run this single command:
-   ```bash
-   gcloud auth application-default login
-   ```
-3. A browser tab will open — select your Google account and click **Allow**.
-4. **Done!** The extension automatically detects these credentials on your system. Zero file copying needed!
+#### Option A: Application Default Credentials (ADC) — *Recommended for Developers*
+Run this single command in your terminal:
+```bash
+gcloud auth application-default login
+```
+A browser tab will open — sign in and click **Allow**. The extension automatically detects this!
 
----
+#### Option B: Service Account JSON Key — *Best for Sharing*
+1. In Google Cloud Console, go to **IAM & Admin** -> **Service Accounts**.
+2. Click **+ CREATE SERVICE ACCOUNT**, name it `gemini-argon`, grant role **Vertex AI User**.
+3. Under the **Keys** tab, click **Add Key** -> **Create new key** -> **JSON**.
+4. In the extension **⚙️ Settings**, select Auth Method: **Service Account Key (JSON file)** and browse to your file.
 
-### Option B: Service Account JSON Key — *Recommended for Sharing with Friends*
-If you want to use the extension without installing the `gcloud` CLI:
-1. In Google Cloud Console, open the navigation menu (☰) and navigate to **IAM & Admin** -> **Service Accounts**.
-2. Click **+ CREATE SERVICE ACCOUNT** at the top.
-3. Enter a name (e.g., `gemini-argon-agent`) and click **Create and Continue**.
-4. In the **Role** dropdown, select **Vertex AI** -> **Vertex AI User**. Click **Done**.
-5. Click on the created service account from the list -> open the **Keys** tab.
-6. Click **Add Key** -> **Create new key** -> select **JSON** -> click **Create**.
-7. A `.json` key file will download to your computer.
-8. In the extension:
-   - Click the **⚙️ Settings** icon in the header.
-   - Select Auth Method: **Service Account Key (JSON file)**.
-   - Click **Browse...** and select your downloaded JSON key file.
-   - Click **Save Settings**!
-
----
-
-### Option C: Vertex AI API Key
-1. In Google Cloud Console, navigate to **APIs & Services** -> **Credentials**.
+#### Option C: Vertex AI API Key
+1. In Google Cloud Console, go to **APIs & Services** -> **Credentials**.
 2. Click **+ CREATE CREDENTIALS** -> **API key**.
-3. Copy the generated key.
-4. In the extension ⚙️ Settings, select Auth Method: **Vertex AI API Key**, paste your key, and click **Save Settings**.
+3. Paste it in the extension **⚙️ Settings** under **Vertex AI API Key**.
 
 ---
 
-## 🛡️ Budget Alert Guard (Ensure 100% Zero Out-of-Pocket Cost)
+## 🛡️ Budget Alert Guard (100% Zero-Cost Safeguard)
 
-To ensure you never accidentally spend more than your free credits:
-1. In Google Cloud Console, open the navigation menu (☰) and select **Billing**.
-2. Click **Budgets & alerts** in the left sidebar.
-3. Click **+ CREATE BUDGET**.
-4. Set Target:
-   - Scope: Select your Project.
-   - Target amount: Set a small target like **$10 USD** (or **₹1,000 INR**).
-   - Set threshold alerts at **50%**, **80%**, and **100%**.
-   - Check the box: *"Email alerts to billing account administrators"*.
-5. Click **Finish**. Google will email you well before you reach any billing threshold.
+To guarantee you never exceed your free credits:
+1. In Google Cloud Console, open the navigation menu (☰) and select **Billing** -> **Budgets & alerts**.
+2. Click **+ CREATE BUDGET**.
+3. Set Target amount to a safe limit like **$10 USD** (or **₹1,000 INR**).
+4. Check *"Email alerts to billing account administrators"*. Google will notify you long before reaching any threshold!
 
 ---
 
 ## 📦 Installation Guide
 
 ### Method 1: 1-Click Installer (Windows)
-Double-click **`INSTALL.bat`** inside this repository folder! It automatically compiles and installs the extension directly into Antigravity IDE and VS Code.
+Double-click **`INSTALL.bat`** in this repository folder. It automatically registers the extension into Antigravity IDE and VS Code.
 
 ### Method 2: Install via GUI (Antigravity IDE or VS Code)
 1. Open Antigravity IDE or VS Code.
 2. Press `Ctrl + Shift + P` (or `Cmd + Shift + P` on macOS).
 3. Type and select: **`Extensions: Install from VSIX...`**.
-4. Select `gemini-4-argon-1.1.0.vsix` from this folder.
+4. Select `gemini-4-argon-1.1.0.vsix` from this repository.
 5. Reload window (`Developer: Reload Window`).
 
 ### Method 3: Command Line Installation
-Open your terminal in the directory where `gemini-4-argon-1.1.0.vsix` is located:
-
 ```bash
 # For Antigravity IDE:
 antigravity-ide --install-extension ./gemini-4-argon-1.1.0.vsix
@@ -328,11 +401,11 @@ code --install-extension ./gemini-4-argon-1.1.0.vsix
 
 ## 🤝 Contributing & Community Governance
 
-Contributions, bug reports, and feature suggestions are warmly welcomed!
+We welcome contributions, bug reports, and pull requests!
 
-All pull requests are reviewed, verified, and merged exclusively by the project maintainer: **[Lucky Kuntal](https://github.com/ffzlucky7-coder)**.
+To protect project stability, code security, and architectural integrity, all pull requests must be reviewed and approved by the maintainer: **[Lucky Kuntal](https://github.com/ffzlucky7-coder)**.
 
-Please read our **[CONTRIBUTING.md](CONTRIBUTING.md)** and **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** for details on our code standards and pull request review process.
+Please read our **[CONTRIBUTING.md](CONTRIBUTING.md)** and **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** before submitting code.
 
 ---
 
@@ -341,7 +414,7 @@ Please read our **[CONTRIBUTING.md](CONTRIBUTING.md)** and **[CODE_OF_CONDUCT.md
 **Lucky Kuntal**
 - **GitHub**: [@ffzlucky7-coder](https://github.com/ffzlucky7-coder)
 - **Repository**: [https://github.com/ffzlucky7-coder/gemini-4-argon](https://github.com/ffzlucky7-coder/gemini-4-argon)
-- **Created for**: Antigravity IDE, VS Code, Claude Desktop & Codex
+- **Designed for**: Antigravity IDE, VS Code, Claude Desktop, Claude Code & Codex
 
 ---
 
