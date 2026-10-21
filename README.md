@@ -13,8 +13,13 @@
 
 <br/>
 
+[![Google Gemini](https://img.shields.io/badge/Google-Gemini%204%20Argon-8E75C2?style=for-the-badge&logo=googlegemini&logoColor=white)](#-supported-ai-models-free-vs-frontier)
+[![Anthropic Claude](https://img.shields.io/badge/Anthropic-Claude%20Opus%205.5-D97706?style=for-the-badge&logo=anthropic&logoColor=white)](#-supported-ai-models-free-vs-frontier)
+[![OpenAI](https://img.shields.io/badge/OpenAI-GPT--6%20Astra-10A37F?style=for-the-badge&logo=openai&logoColor=white)](#-supported-ai-models-free-vs-frontier)
+
+<br/>
+
 [![Engine](https://img.shields.io/badge/Default%20Free%20Engine-Google%20Vertex%20AI-4285F4.svg?style=flat-square&logo=googlecloud)](https://cloud.google.com/vertex-ai)
-[![Models](https://img.shields.io/badge/Models-Gemini%204%20Argon%20%7C%20Claude%20Opus%205.5%20%7C%20GPT--6-7f00ff.svg?style=flat-square)](#-supported-ai-models--multi-model-engine)
 [![Attachments](https://img.shields.io/badge/Multimodal-Vision%20%2B%20Docs-f59e0b.svg?style=flat-square)](#-multimodal-attachments-vision--files)
 [![Platforms](https://img.shields.io/badge/Supported-Antigravity%20%7C%20VS%20Code%20%7C%20Claude%20%7C%20Cursor%20%7C%20Codex-38bdf8.svg?style=flat-square)](#-universal-compatibility--integrations)
 
@@ -48,9 +53,22 @@
 
 ## 🧠 Supported AI Models (Free vs Frontier)
 
-Gemini 4 Argon is built on a **Universal Multi-Model Adapter**. You can use the flagship **Google Gemini 4 Argon for 100% FREE** using trial credits, or bring your own API key to tap into the latest frontier Claude and OpenAI models:
+<p align="center">
+  <img src="https://cdn.simpleicons.org/googlegemini/8E75C2" width="60" height="60" alt="Google Gemini" />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://cdn.simpleicons.org/anthropic/D97706" width="60" height="60" alt="Anthropic Claude" />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://cdn.simpleicons.org/openai/10A37F" width="60" height="60" alt="OpenAI ChatGPT" />
+</p>
+
+Gemini 4 Argon is powered by a **Universal Multi-Model Adapter**. You can run the flagship **Google Gemini 4 Argon for 100% FREE** using trial credits, or plug in your own API key to tap into the latest frontier Claude and OpenAI models:
 
 ### 🌟 1. 100% Free Default Model (Out-of-the-Box)
+
+<p align="left">
+  <img src="https://cdn.simpleicons.org/googlegemini/8E75C2" width="24" height="24" style="vertical-align: middle;" />
+  <strong>&nbsp;Google Gemini 4 Argon (Vertex AI Global Endpoint)</strong>
+</p>
 
 | Model | Provider | Cost | Capabilities |
 | :--- | :--- | :--- | :--- |
@@ -64,7 +82,7 @@ Gemini 4 Argon is built on a **Universal Multi-Model Adapter**. You can use the 
 
 Easily switch to these frontier models anytime from the extension **⚙️ Settings**:
 
-#### 🟣 Anthropic Claude 5.x Tier
+#### <img src="https://cdn.simpleicons.org/anthropic/D97706" width="22" height="22" style="vertical-align: middle;" /> Anthropic Claude 5.x Tier
 | Model | Identifier | Purpose & Strength |
 | :--- | :--- | :--- |
 | **Claude Opus 5.5** | `claude-opus-5.5` | **Flagship Deep Reasoning**: Architectural system design, complex algorithmic logic, and repository-wide planning. |
@@ -72,7 +90,7 @@ Easily switch to these frontier models anytime from the extension **⚙️ Setti
 | **Claude Fable 5.1** | `claude-fable-5.1` | **Mythos Class Frontier**: Advanced creative problem-solving and frontier exploration. |
 | **Claude Haiku 5.5** | `claude-haiku-5.5` | **Fast & Lightweight**: Instant responses, quick documentation, and micro-edits. |
 
-#### 🟢 OpenAI GPT-6 Tier
+#### <img src="https://cdn.simpleicons.org/openai/10A37F" width="22" height="22" style="vertical-align: middle;" /> OpenAI GPT-6 Tier
 | Model | Identifier | Purpose & Strength |
 | :--- | :--- | :--- |
 | **GPT-6 Astra** | `gpt-6-astra` | **Flagship Software Engineering**: Advanced code synthesis, logic proofing, and full-stack building. |
