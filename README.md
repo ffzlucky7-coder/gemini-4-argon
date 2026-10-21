@@ -54,11 +54,17 @@
 ## 🧠 Supported AI Models (Free vs Frontier)
 
 <p align="center">
-  <img src="https://cdn.simpleicons.org/googlegemini/8E75C2" width="60" height="60" alt="Google Gemini" />
+  <a href="https://svgl.app/directory/ai" target="_blank">
+    <img src="https://svgl.app/library/gemini.svg" width="65" height="65" alt="Google Gemini SVGL" />
+  </a>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://cdn.simpleicons.org/anthropic/D97706" width="60" height="60" alt="Anthropic Claude" />
+  <a href="https://svgl.app/directory/ai" target="_blank">
+    <img src="https://svgl.app/library/claude-ai-icon.svg" width="65" height="65" alt="Anthropic Claude SVGL" />
+  </a>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://cdn.simpleicons.org/openai/10A37F" width="60" height="60" alt="OpenAI ChatGPT" />
+  <a href="https://svgl.app/directory/ai" target="_blank">
+    <img src="https://svgl.app/library/openai.svg" width="65" height="65" alt="OpenAI SVGL" />
+  </a>
 </p>
 
 Gemini 4 Argon is powered by a **Universal Multi-Model Adapter**. You can run the flagship **Google Gemini 4 Argon for 100% FREE** using trial credits, or plug in your own API key to tap into the latest frontier Claude and OpenAI models:
@@ -66,7 +72,7 @@ Gemini 4 Argon is powered by a **Universal Multi-Model Adapter**. You can run th
 ### 🌟 1. 100% Free Default Model (Out-of-the-Box)
 
 <p align="left">
-  <img src="https://cdn.simpleicons.org/googlegemini/8E75C2" width="24" height="24" style="vertical-align: middle;" />
+  <img src="https://svgl.app/library/gemini.svg" width="24" height="24" style="vertical-align: middle;" />
   <strong>&nbsp;Google Gemini 4 Argon (Vertex AI Global Endpoint)</strong>
 </p>
 
@@ -82,7 +88,7 @@ Gemini 4 Argon is powered by a **Universal Multi-Model Adapter**. You can run th
 
 Easily switch to these frontier models anytime from the extension **⚙️ Settings**:
 
-#### <img src="https://cdn.simpleicons.org/anthropic/D97706" width="22" height="22" style="vertical-align: middle;" /> Anthropic Claude 5.x Tier
+#### <img src="https://svgl.app/library/claude-ai-icon.svg" width="22" height="22" style="vertical-align: middle;" /> Anthropic Claude 5.x Tier
 | Model | Identifier | Purpose & Strength |
 | :--- | :--- | :--- |
 | **Claude Opus 5.5** | `claude-opus-5.5` | **Flagship Deep Reasoning**: Architectural system design, complex algorithmic logic, and repository-wide planning. |
@@ -90,7 +96,7 @@ Easily switch to these frontier models anytime from the extension **⚙️ Setti
 | **Claude Fable 5.1** | `claude-fable-5.1` | **Mythos Class Frontier**: Advanced creative problem-solving and frontier exploration. |
 | **Claude Haiku 5.5** | `claude-haiku-5.5` | **Fast & Lightweight**: Instant responses, quick documentation, and micro-edits. |
 
-#### <img src="https://cdn.simpleicons.org/openai/10A37F" width="22" height="22" style="vertical-align: middle;" /> OpenAI GPT-6 Tier
+#### <img src="https://svgl.app/library/openai.svg" width="22" height="22" style="vertical-align: middle;" /> OpenAI GPT-6 Tier
 | Model | Identifier | Purpose & Strength |
 | :--- | :--- | :--- |
 | **GPT-6 Astra** | `gpt-6-astra` | **Flagship Software Engineering**: Advanced code synthesis, logic proofing, and full-stack building. |
