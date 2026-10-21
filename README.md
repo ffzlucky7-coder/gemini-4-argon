@@ -87,9 +87,11 @@ Gemini 4 Argon is powered by a **Universal Multi-Model Adapter**. You can run th
 
 ---
 
-### 🚀 2. Frontier Multi-Model Engine (Bring Your Own Key)
+### 🚀 2. Frontier Multi-Model Engine (100% Free Access & Cloud Credits)
 
-Easily switch to these frontier models anytime from the extension **⚙️ Settings**:
+> **🎉 100% Zero-Cost Architecture:** You do **NOT** need to pay a single rupee out-of-pocket! Both **Google Gemini 4 Argon** and **Anthropic Claude** are fully covered under Google Cloud's **$300 (₹26,000 INR)** Free Trial Credits via Vertex AI Model Garden, while **OpenAI** models run seamlessly with free developer tokens.
+
+Easily switch between these top-tier frontier models anytime from the extension **⚙️ Settings**:
 
 #### <img src="https://raw.githubusercontent.com/ffzlucky7-coder/gemini-4-argon/main/media/logos/claude.svg" width="22" height="22" style="vertical-align: middle;" /> Anthropic Claude 5.x Tier
 | Model | Identifier | Purpose & Strength |
