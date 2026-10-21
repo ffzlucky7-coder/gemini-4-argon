@@ -28,12 +28,22 @@
 - [🧠 Supported AI Models (Free vs Frontier)](#-supported-ai-models-free-vs-frontier)
 - [☁️ How to Run Latest Claude Models for 100% FREE on Vertex AI (Via $300 Credits)](#️-how-to-run-latest-claude-models-for-100-free-on-vertex-ai-via-300-credits)
 - [🎁 How to Claim $300 (₹26,000 INR) Free Credits on Google Cloud](#-how-to-claim-300-26000-inr-free-credits-on-google-cloud)
+  - [💳 Prepayment & ₹1,000 Refundable Verification Deposit](#-important-the-prepayment--1000-refundable-verification-deposit-explained)
+  - [🛡️ Budget Alert Guard (100% Zero-Cost Safeguard)](#️-budget-alert-guard-100-zero-cost-safeguard)
 - [✨ Core Capabilities & Architecture](#-core-capabilities--architecture)
+  - [📐 System & Integration Architecture](#-system--integration-architecture)
+  - [🔄 Multi-Turn Autonomous Tool Execution Flow](#-multi-turn-autonomous-tool-execution-flow)
+  - [🛠️ Autonomous Workspace Tools (MCP Standard)](#️-autonomous-workspace-tools-model-context-protocol)
 - [📎 Multimodal Attachments (Vision & Files)](#-multimodal-attachments-vision--files)
 - [⚡ Real-Time Streaming & Visual Tool Badges](#-real-time-streaming--visual-tool-badges)
 - [🛡️ Resilient Rate Limiting & Cooldown Engine](#️-resilient-rate-limiting--cooldown-engine)
 - [🚀 Quickstart & Installation](#-quickstart--installation)
-- [🤝 Universal Compatibility: Claude Desktop, Cursor & Codex MCP](#-universal-compatibility-claude-desktop-cursor--codex-mcp)
+- [🎮 Step-by-Step Usage Guide: What to Click in Each App](#-step-by-step-usage-guide-what-to-click-in-each-app)
+  - [💎 1. Antigravity IDE & VS Code Extension](#1--antigravity-ide--vs-code-extension)
+  - [🖥️ 2. Claude Desktop (Via MCP Server)](#2-️-claude-desktop-via-mcp-server)
+  - [⚡ 3. Cursor IDE & Windsurf](#3-️-cursor-ide--windsurf)
+  - [💻 4. Claude Code CLI](#4--claude-code-cli)
+  - [🌐 5. Remote MCP HTTP/SSE Bridge](#5--remote-mcp-httpsse-bridge-start-mcp-serverbat)
 - [🔒 Zero-Data Privacy & Security](#-zero-data-privacy--security)
 - [👨‍💻 Author & Contributing](#-author--contributing)
 
@@ -156,22 +166,45 @@ gcloud config set project YOUR_PROJECT_ID
 
 ## 🎁 How to Claim $300 (₹26,000 INR) Free Credits on Google Cloud
 
-Google Cloud offers **$300 USD (approx. ₹26,000 INR)** in 100% free credits for 90 days to any new Google Cloud account. Follow these steps to activate your free tier:
+Google Cloud offers **$300 USD (approx. ₹26,000 INR)** in 100% free credits for 90 days to every new account. Both **Google Gemini 4 Argon** and Vertex AI Model Garden's **Claude Opus 5.5 / 5 / 4.8 / 4.7** are 100% covered under these trial credits!
+
+### 💳 Important: The Prepayment & ₹1,000 Refundable Verification Deposit Explained
+
+> [!IMPORTANT]
+> **Why does Google ask for a card and perform a ₹1,000 prepayment/charge during signup?**
+> - **Global Anti-Abuse Verification**: To comply with international banking security (and RBI guidelines in India), Google Cloud executes a **temporary pre-authorization charge of ₹1,000 INR** (or ₹2 depending on card issuer) to confirm card authenticity and prevent bot multi-accounting.
+> - **100% REFUNDABLE DEPOSIT**: This is **NOT** a purchase or fee! Google Cloud automatically **refunds the entire amount back to your bank account / card immediately** (or within a few business hours). Your net cost remains **₹0.00**.
+> - **Zero Automatic Charges Guarantee**: Google Cloud explicitly guarantees that **your card will NEVER be charged automatically** when the free trial ends or when credits run out. To ever be charged, you would have to manually click an "Upgrade to Paid Account" button inside the Google Cloud Console.
+> - **Full ₹26,000 ($300 USD) Usable Credit**: You receive the full $300 balance in your account immediately for 90 days of heavy autonomous coding!
+
+### Step-by-Step Signup:
 
 1. **Visit the Free Trial Page**: Open [https://cloud.google.com/free](https://cloud.google.com/free) in your browser.
 2. **Sign In**: Click **"Get started for free"** and sign in with your Google account.
-3. **Account & Verification**: Select your country, verify your phone number, and enter payment details (credit/debit card) for zero-charge identity verification.
-4. **Create a Project**:
-   - Go to [Google Cloud Console](https://console.cloud.google.com/).
-   - Click the project dropdown at the top -> **"New Project"**.
-   - Name it (e.g. `gemini-argon-workspace`). Note your **Project ID**.
+3. **Account & Identity Verification**:
+   - Select your Country (e.g. India).
+   - Enter your name and address.
+   - Enter your payment card details (Credit Card or RBI-compliant Debit Card) for the temporary ₹1,000 refundable pre-authorization check.
+4. **Create Your Google Cloud Project**:
+   - In [Google Cloud Console](https://console.cloud.google.com/), click the top project dropdown -> **"New Project"**.
+   - Enter a Project Name (e.g. `gemini-argon-workspace`).
+   - Copy your **Project ID** (e.g. `gemini-argon-workspace-12345`).
 5. **Enable Vertex AI API**:
-   - In the search bar, type `Vertex AI API` -> Click **"Enable"**.
-6. **Log in with ADC**:
+   - In the console search bar, type `Vertex AI API` -> Click **"Enable"**.
+6. **Log in with Application Default Credentials (ADC)**:
    ```bash
    gcloud auth application-default login
+   gcloud config set project YOUR_PROJECT_ID
    ```
-   A browser window will open. Click Allow. Your local environment now has full free access!
+   A browser window will open. Sign in and click **Allow**. Local authentication is now active!
+
+### 🛡️ Budget Alert Guard (100% Zero-Cost Safeguard)
+
+To guarantee you never exceed your free credits:
+1. In Google Cloud Console, open the navigation menu (☰) -> **Billing** -> **Budgets & alerts**.
+2. Click **+ CREATE BUDGET**.
+3. Set Target amount to a safe limit like **$10 USD** (or **₹1,000 INR**).
+4. Check *"Email alerts to billing account administrators"*. Google will notify you long before reaching any threshold!
 
 ---
 
@@ -301,37 +334,143 @@ It automatically detects installed Antigravity IDE and VS Code editions, builds 
 
 ---
 
-## 🤝 Universal Compatibility: Claude Desktop, Cursor & Codex MCP
+## 🎮 Step-by-Step Usage Guide: What to Click in Each App
 
-Gemini 4 Argon implements a complete **Model Context Protocol (MCP)** server, making its autonomous tools available to other frontier environments:
+After setup, here is **exactly what buttons to click, what shortcuts to press, and how to trigger autonomous coding** in each supported tool:
 
-### Claude Desktop Integration (`claude_desktop_config.json`)
-Add the following to your Claude Desktop config file:
-```json
-{
-  "mcpServers": {
-    "gemini-4-argon": {
-      "command": "node",
-      "args": [
-        "PATH_TO_EXTENSION/mcp/server.js"
-      ],
-      "env": {
-        "GEMINI_PROJECT_ID": "YOUR_GCP_PROJECT_ID",
-        "GEMINI_LOCATION": "global",
-        "GEMINI_AUTH_METHOD": "adc"
-      }
-    }
-  }
-}
-```
+---
 
-### Cursor & Codex Integration
-Add the Gemini 4 Argon MCP server in Cursor settings under **Features > MCP Servers** with the same `node mcp/server.js` command.
+### 1. 💎 Antigravity IDE & VS Code Extension
 
-### Remote MCP HTTP/SSE Bridge (`start-mcp-server.bat`)
-For environments requiring remote or HTTP-based MCP endpoints:
-- Double click **`mcp/start-mcp-server.bat`** (or run `node mcp/http-server.js`).
-- The server will start locally on port `3333` and optionally expose an encrypted Cloudflare HTTPS tunnel for remote access.
+#### Exactly What to Click to Setup & Run:
+1. **Open Extension Panel**: Click the **Gemini 4 Argon (💎)** icon in the left Activity Bar.
+2. **Open Settings**: Click the **⚙️ (Settings)** icon in the top right corner of the extension sidebar.
+3. **Configure Your Engine & Model**:
+   - **AI Engine Dropdown**: Select **`Google Vertex AI (Gemini 4 Argon) [Default]`** OR **`Anthropic Claude (Vertex AI Model Garden)`**.
+   - **Model Tier Dropdown**: Select **`Gemini 4 Argon`**, **`Claude Opus 5.5`**, **`Claude Opus 5`**, **`Claude Opus 4.8`**, or **`Claude Sonnet 5.5`**.
+   - **Google Cloud Project ID**: Type your Project ID (e.g. `gemini-argon-workspace-12345`).
+   - **Thinking Budget**: Click the **High** pill (recommended for full autonomous AAA coding).
+   - *(Optional Anthropic API Key)*: Leave blank to use your Google Cloud **$300 Free Credits**!
+4. **Save & Verify**:
+   - Click the blue **"Save Settings"** button.
+   - Click the **"Test Connection"** button — wait 1-2 seconds until the green *"Connected successfully"* badge appears.
+   - Click the **✕** button to close Settings.
+5. **How to Trigger Coding in Chat**:
+   - Click inside the composer input box at the bottom.
+   - *(Optional Attachment)*: Click the paperclip icon (**📎**) or drag-and-drop a UI screenshot, PDF spec, or code file into the chat window.
+   - Type your task (e.g. `"Audit my auth system, write comprehensive pytest unit tests, and fix all edge cases."`).
+   - Press **Enter** (or click the blue **Send / Paper Airplane ✈️** button).
+6. **Watch Real-Time Execution**:
+   - Gemini 4 Argon will stream its thinking thoughts live.
+   - Interactive tool badges will appear: click any tool pill (e.g. `Editing src/auth.py`) to inspect surgical line diffs.
+
+---
+
+### 2. 🖥️ Claude Desktop (Via MCP Server)
+
+#### Exactly What to Click to Setup & Run:
+1. **Configure MCP Server**:
+   Open `claude_desktop_config.json` (`%APPDATA%\Claude\claude_desktop_config.json` on Windows or `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+   ```json
+   {
+     "mcpServers": {
+       "gemini-4-argon": {
+         "command": "node",
+         "args": [
+           "C:/path/to/gemini-4-argon/mcp/server.js"
+         ],
+         "env": {
+           "GEMINI_PROJECT_ID": "YOUR_GCP_PROJECT_ID",
+           "GEMINI_LOCATION": "global",
+           "GEMINI_AUTH_METHOD": "adc"
+         }
+       }
+     }
+   }
+   ```
+   *(Use forward slashes `/` in file paths).*
+2. **Restart Claude Desktop**: Close Claude Desktop completely from taskbar and reopen it.
+3. **Verify the Active Tools**:
+   - In Claude Desktop's chat window, look at the bottom-right corner next to the input box.
+   - You will see a small **Hammer / Tool (`🛠️`) icon**.
+   - Click the **Hammer (`🛠️`) icon** — you should see all 8 Gemini 4 Argon tools listed:
+     - `gemini_4_argon_reason`
+     - `read_file`, `write_file`, `edit_file`
+     - `list_dir`, `get_workspace_structure`
+     - `search_code`, `run_command`
+4. **How to Trigger in Chat**:
+   - In the Claude chat box, type:
+     ```text
+     @gemini-4-argon inspect the codebase in D:/my-project, analyze existing bugs, and write the missing tests.
+     ```
+   - Or ask Claude to consult Gemini 4 Argon for deep reasoning:
+     ```text
+     Use gemini_4_argon_reason to review this database schema and propose an enterprise partition strategy.
+     ```
+5. **What to Click During Tool Calls**:
+   - When Claude calls a tool, an approval card will appear in chat: **"Allow gemini-4-argon to execute edit_file?"**
+   - Click **"Allow"** (or click **"Always allow for this session"**).
+   - Gemini 4 Argon executes the tool directly on your disk and delivers the verified output back to Claude!
+
+---
+
+### 3. ⚡ Cursor IDE & Windsurf
+
+#### Exactly What to Click to Setup & Run:
+1. **Open Settings**: In Cursor, press **`Ctrl + ,`** (or **`Cmd + ,`** on macOS).
+2. Navigate to **Features** -> **MCP**.
+3. Click the **"+ Add New MCP Server"** button:
+   - **Name**: `gemini-4-argon`
+   - **Type**: `command`
+   - **Command**: `node "<ABSOLUTE_PATH>/mcp/server.js"`
+4. **Open Chat / Composer**:
+   - Press **`Ctrl + L`** to open Cursor Chat, or **`Ctrl + I`** to open Composer.
+   - In the composer bar, switch the dropdown mode from **"Normal"** to **"Agent Mode"**.
+5. **How to Trigger**:
+   - In the input box, tag `@gemini-4-argon` or prompt directly:
+     ```text
+     Use gemini-4-argon tools to search for all authentication middleware and refactor token refresh logic.
+     ```
+   - Press **Enter**.
+6. **What to Click**:
+   - Cursor will display a tool invocation block with an **"Approve" / "Run"** button.
+   - Click **"Run"** (or toggle **"Auto-run tools"** in Cursor settings).
+   - Cursor and Gemini 4 Argon will refactor the files and present you with surgical side-by-side git diffs to accept!
+
+---
+
+### 4. 💻 Claude Code CLI
+
+#### Exactly What to Click/Type:
+1. Launch your terminal and start Claude Code:
+   ```bash
+   claude
+   ```
+2. Register the Gemini 4 Argon MCP server:
+   ```bash
+   claude mcp add gemini-4-argon node "C:/path/to/gemini-4-argon/mcp/server.js"
+   ```
+3. In the CLI prompt, instruct Claude:
+   ```text
+   Use gemini_4_argon_reason and workspace tools to audit repo performance.
+   ```
+4. When prompted `[y/n]` to execute tools, press **`y`** and hit **Enter**.
+
+---
+
+### 5. 🌐 Remote MCP HTTP/SSE Bridge (`start-mcp-server.bat`)
+
+For remote development environments, SSH workspaces, or custom web clients:
+1. **Start the Server**:
+   - Double-click **`mcp/start-mcp-server.bat`** on Windows (or run `node mcp/http-server.js`).
+2. A command prompt window will launch:
+   - Local SSE server starts at: `http://localhost:3333`
+   - If Cloudflare Tunnel (`cloudflared`) is installed, an instant secure HTTPS URL is printed:
+     `https://<your-tunnel-name>.trycloudflare.com`
+3. **In Your Remote MCP Client**:
+   - Paste the Server URL: `https://<your-tunnel-name>.trycloudflare.com/mcp` (or `/sse`).
+   - Select Authentication: **None**.
+   - Click **Connect**!
 
 ---
 
