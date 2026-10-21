@@ -115,9 +115,7 @@
   const cfgModelId = document.getElementById('cfgModelId');
   const vertexConfigFields = document.getElementById('vertexConfigFields');
   const claudeConfigFields = document.getElementById('claudeConfigFields');
-  const openAiConfigFields = document.getElementById('openAiConfigFields');
   const cfgClaudeKey = document.getElementById('cfgClaudeKey');
-  const cfgOpenAiKey = document.getElementById('cfgOpenAiKey');
 
   // Attachment state
   let currentAttachments = [];
@@ -581,7 +579,7 @@
     const p = (provider || 'vertex').toLowerCase();
     if (vertexConfigFields) vertexConfigFields.style.display = p === 'vertex' ? 'block' : 'none';
     if (claudeConfigFields) claudeConfigFields.style.display = p === 'claude' ? 'block' : 'none';
-    if (openAiConfigFields) openAiConfigFields.style.display = p === 'openai' ? 'block' : 'none';
+    
 
     if (cfgModelId) {
       const options = cfgModelId.options;
@@ -591,7 +589,7 @@
         let visible = false;
         if (p === 'vertex' && opt.value.startsWith('gemini')) visible = true;
         if (p === 'claude' && opt.value.startsWith('claude')) visible = true;
-        if (p === 'openai' && opt.value.startsWith('gpt')) visible = true;
+        
 
         opt.style.display = visible ? '' : 'none';
         opt.disabled = !visible;
@@ -621,7 +619,6 @@
         serviceAccountKeyPath: cfgSaPath ? cfgSaPath.value.trim() : '',
         apiKey: cfgApiKey ? cfgApiKey.value.trim() : '',
         claudeApiKey: cfgClaudeKey ? cfgClaudeKey.value.trim() : '',
-        openAiApiKey: cfgOpenAiKey ? cfgOpenAiKey.value.trim() : '',
         thinkingLevel: currentThinkingLevel
       };
       vscode.postMessage({ type: 'saveConfig', config });
@@ -640,13 +637,12 @@
         serviceAccountKeyPath: cfgSaPath ? cfgSaPath.value.trim() : '',
         apiKey: cfgApiKey ? cfgApiKey.value.trim() : '',
         claudeApiKey: cfgClaudeKey ? cfgClaudeKey.value.trim() : '',
-        openAiApiKey: cfgOpenAiKey ? cfgOpenAiKey.value.trim() : '',
         thinkingLevel: 'low'
       };
       if (testConnResult) {
         testConnResult.className = 'test-result';
         testConnResult.style.display = 'block';
-        const pName = config.provider === 'claude' ? 'Claude' : (config.provider === 'openai' ? 'OpenAI' : 'Gemini 4 Argon');
+        const pName = config.provider === 'claude' ? 'Claude (Model Garden)' : 'Gemini 4 Argon';
         testConnResult.textContent = `Testing connection to ${pName}...`;
       }
       vscode.postMessage({ type: 'testConnection', config });
@@ -1034,7 +1030,6 @@
         if (cfgProvider) cfgProvider.value = cfg.provider || 'vertex';
         if (cfgModelId) cfgModelId.value = cfg.modelId || 'gemini-4-argon';
         if (cfgClaudeKey) cfgClaudeKey.value = cfg.claudeApiKey || '';
-        if (cfgOpenAiKey) cfgOpenAiKey.value = cfg.openAiApiKey || '';
 
         updateAuthFieldsVisibility(cfg.authMethod || 'adc');
         updateProviderFieldsVisibility(cfg.provider || 'vertex');

@@ -1,11 +1,11 @@
 /**
  * agentLoop.js
- * Multi-turn autonomous agent execution loop supporting Gemini 4 Argon, Claude 5.x, and GPT-6
+ * Multi-turn autonomous agent execution loop supporting Gemini 4 Argon and Anthropic Claude
  * Features:
  *  - Full workspace autonomous tool orchestration
  *  - Multimodal media/file attachments (Images, Audio, PDF, Code)
  *  - Dynamic Thinking Level control (Low, Medium, High)
- *  - Multi-provider dispatching (Vertex AI, Anthropic Claude, OpenAI)
+ *  - Multi-provider dispatching (Vertex AI, Anthropic Claude on Model Garden)
  *  - Real-time event streaming to Webview UI
  *  - Automatic error recovery and abort handling
  * 
@@ -93,8 +93,6 @@ class GeminiAgent {
 
     const modelDisplayName = provider === 'claude'
       ? `Claude (${modelId})`
-      : provider === 'openai'
-      ? `OpenAI (${modelId})`
       : `Gemini 4 Argon`;
 
     onEvent({

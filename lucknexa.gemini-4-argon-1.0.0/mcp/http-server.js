@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Gemini 4 Argon HTTP & SSE MCP Server
- * Compatible with ChatGPT Desktop, ChatGPT Custom MCP, Claude Desktop, and Remote Clients
+ * Compatible with Claude Desktop, Cursor, Antigravity IDE, Windsurf, and Remote MCP Clients
  * Author: Lucky Kuntal (https://github.com/ffzlucky7-coder)
  */
 

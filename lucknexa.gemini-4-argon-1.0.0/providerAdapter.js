@@ -1,19 +1,17 @@
 /**
  * providerAdapter.js
- * Multi-Model Provider Engine for Gemini 4 Argon, Claude 5.x, and GPT-6
+ * Multi-Model Provider Engine for Gemini 4 Argon and Anthropic Claude (Vertex AI Model Garden)
  * Author: Lucky Kuntal (https://github.com/ffzlucky7-coder)
  * 
  * Supported Providers & Model Tiers:
- *  1. Google Vertex AI (Default): Gemini 4 Argon Flagship Reasoning
- *  2. Anthropic Claude 5.x:
- *     - Claude Opus 5.5 (Flagship deep reasoning & complex agentic)
- *     - Claude Sonnet 5.5 (High-effort workhorse coding)
- *     - Claude Fable 5.1 (Mythos class frontier)
- *     - Claude Haiku 5.5 (Fastest & most affordable)
- *  3. OpenAI GPT-6:
- *     - GPT-6 Astra (Flagship reasoning & software engineering)
- *     - GPT-6.1 Sol (Near-Astra heavy coding)
- *     - GPT-6 Luna (Cost-efficient high volume)
+ *  1. Google Vertex AI (Default): Gemini 4 Argon Flagship Reasoning (100% Free via $300 Credits)
+ *  2. Anthropic Claude (Google Cloud Vertex AI Model Garden):
+ *     - Claude Opus 5.5 (Model Garden Flagship Deep Reasoning)
+ *     - Claude Opus 5 (Model Garden Autonomous Agentic Engineering)
+ *     - Claude Opus 4.8 (Model Garden Deep Reasoning & Architecture)
+ *     - Claude Opus 4.7 (Model Garden High Precision Production Coding)
+ *     - Claude Sonnet 5.5 (Model Garden Coding Workhorse)
+ *     - Claude Haiku 5.5 (Model Garden Fast Iteration & Lookups)
  */
 
 const { getAuthHeaders } = require('./authProvider');
@@ -28,33 +26,18 @@ function getAnthropicTools() {
   }));
 }
 
-// Convert tool definitions to OpenAI format
-function getOpenAITools() {
-  return vertexAIToolDeclarations.map(decl => ({
-    type: 'function',
-    function: {
-      name: decl.name,
-      description: decl.description,
-      parameters: decl.parameters
-    }
-  }));
-}
-
 // Model registry metadata
 const MODEL_TIERS = {
   vertex: [
     { id: 'gemini-4-argon', name: 'Gemini 4 Argon (Vertex AI Flagship)', default: true }
   ],
   claude: [
-    { id: 'claude-opus-5.5', name: 'Claude Opus 5.5 (Deep Reasoning Flagship)', default: true },
-    { id: 'claude-sonnet-5.5', name: 'Claude Sonnet 5.5 (Coding Workhorse)' },
-    { id: 'claude-fable-5.1', name: 'Claude Fable 5.1 (Mythos Class Frontier)' },
-    { id: 'claude-haiku-5.5', name: 'Claude Haiku 5.5 (Fast & Affordable)' }
-  ],
-  openai: [
-    { id: 'gpt-6-astra', name: 'GPT-6 Astra (Flagship Reasoning & Software Eng)', default: true },
-    { id: 'gpt-6.1-sol', name: 'GPT-6.1 Sol (Heavy Coding Tier)' },
-    { id: 'gpt-6-luna', name: 'GPT-6 Luna (Fast Everyday)' }
+    { id: 'claude-opus-5.5', name: 'Claude Opus 5.5 (Model Garden Flagship)', default: true },
+    { id: 'claude-opus-5', name: 'Claude Opus 5 (Model Garden Autonomous)' },
+    { id: 'claude-opus-4.8', name: 'Claude Opus 4.8 (Model Garden Deep Reasoning)' },
+    { id: 'claude-opus-4.7', name: 'Claude Opus 4.7 (Model Garden Production)' },
+    { id: 'claude-sonnet-5.5', name: 'Claude Sonnet 5.5 (Model Garden Coding Workhorse)' },
+    { id: 'claude-haiku-5.5', name: 'Claude Haiku 5.5 (Model Garden Fast Iteration)' }
   ]
 };
 
@@ -87,8 +70,6 @@ class ProviderAdapter {
 
     if (provider === 'claude') {
       return this.executeClaudeTurn({ history, systemInstruction, thinkingLevel, attachments, signal, onEvent });
-    } else if (provider === 'openai') {
-      return this.executeOpenAITurn({ history, systemInstruction, thinkingLevel, attachments, signal, onEvent });
     } else {
       return this.executeVertexTurn({ history, systemInstruction, thinkingLevel, attachments, signal, onEvent });
     }
@@ -98,42 +79,51 @@ class ProviderAdapter {
   // 1. GOOGLE VERTEX AI (GEMINI 4 ARGON)
   // ==========================================================================
   async executeVertexTurn({ history, systemInstruction, thinkingLevel, attachments, signal, onEvent }) {
-    const projectId = this.config.projectId || process.env.GEMINI_PROJECT_ID || process.env.GCP_PROJECT_ID || '';
-    if (!projectId) {
-      throw new Error('Google Cloud Project ID is required. Please set your Project ID in ⚙️ Settings or set GEMINI_PROJECT_ID.');
-    }
-    const location = this.config.location || 'global';
-    const level = (thinkingLevel || this.config.thinkingLevel || 'high').toLowerCase();
-
     const headers = await getAuthHeaders(this.config);
-    const model = 'gemini-4-argon'; // STRICT: NO FALLBACK, NO SWITCHING
+    const projectId = this.config.projectId || process.env.GEMINI_PROJECT_ID;
+    if (!projectId) {
+      throw new Error('Google Cloud Project ID is not configured. Please enter your Project ID in Settings (⚙️).');
+    }
 
-    const baseUrl = location === 'global' ? 'https://aiplatform.googleapis.com' : `https://${location}-aiplatform.googleapis.com`;
-    const url = `${baseUrl}/v1/projects/${projectId}/locations/${location}/publishers/google/models/${model}:generateContent`;
+    const location = this.config.location || 'global';
+    const endpointHost = location === 'global' ? 'aiplatform.googleapis.com' : `${location}-aiplatform.googleapis.com`;
+    const modelEndpoint = `https://${endpointHost}/v1/projects/${projectId}/locations/${location}/publishers/google/models/gemini-4-argon:generateContent`;
+
+    // Map thinking level to Vertex AI budget
+    let thinkingBudget = 8192;
+    if (thinkingLevel === 'low') thinkingBudget = 2048;
+    else if (thinkingLevel === 'medium') thinkingBudget = 8192;
+    else if (thinkingLevel === 'high') thinkingBudget = 24576;
 
     const requestBody = {
-      systemInstruction: { parts: [{ text: systemInstruction }] },
       contents: history,
+      systemInstruction: {
+        role: 'system',
+        parts: [{ text: systemInstruction }]
+      },
       tools: [{ functionDeclarations: vertexAIToolDeclarations }],
       generationConfig: {
         temperature: 0.2,
-        maxOutputTokens: 8192,
-        thinkingConfig: { thinkingLevel: level }
+        maxOutputTokens: 16384,
+        thinkingConfig: {
+          thinkingBudget: thinkingBudget
+        }
       }
     };
 
-    // Retry schedule for Google Cloud 60s sliding quota window: 10s, 15s, 25s, 40s, 60s
-    const backoffSchedule = [10, 15, 25, 40, 60];
-    const maxRetries = backoffSchedule.length;
+    const maxRetries = 4;
+    let attempt = 0;
     let lastError = null;
 
-    for (let attempt = 0; attempt <= maxRetries; attempt++) {
-      if (signal && signal.aborted) throw new Error('Request cancelled.');
-
+    while (attempt < maxRetries) {
+      attempt++;
       try {
-        const resp = await fetch(url, {
+        const resp = await fetch(modelEndpoint, {
           method: 'POST',
-          headers: headers,
+          headers: {
+            ...headers,
+            'Content-Type': 'application/json; charset=utf-8'
+          },
           body: JSON.stringify(requestBody),
           signal: signal
         });
@@ -141,50 +131,46 @@ class ProviderAdapter {
         if (resp.ok) {
           const data = await resp.json();
           const candidate = data.candidates?.[0];
-          if (!candidate || !candidate.content || !candidate.content.parts) {
-            throw new Error('Empty response received from Gemini 4 Argon.');
+          if (!candidate) {
+            throw new Error('No candidate returned from Gemini 4 Argon.');
           }
 
-          const parts = candidate.content.parts;
-          const functionCalls = parts.filter(p => p.functionCall).map(p => ({
-            name: p.functionCall.name,
-            args: p.functionCall.args,
-            id: p.functionCall.id || `call_${Date.now()}`
-          }));
+          const parts = candidate.content?.parts || [];
+          let text = '';
+          const functionCalls = [];
 
-          const textParts = parts.filter(p => p.text).map(p => p.text).join('\n');
+          for (const p of parts) {
+            if (p.text) text += p.text;
+            if (p.functionCall) functionCalls.push(p.functionCall);
+          }
 
           return {
-            text: textParts,
-            functionCalls: functionCalls,
+            text,
+            functionCalls,
             rawParts: parts,
             provider: 'vertex',
             model: 'gemini-4-argon'
           };
         }
 
-        const status = resp.status;
-        const errJson = await resp.json().catch(() => ({}));
-        const errMsg = errJson.error?.message || `HTTP ${status}: ${resp.statusText}`;
-        lastError = new Error(`Vertex AI Error [Gemini 4 Argon] (${status}): ${errMsg}`);
+        const errText = await resp.text();
+        lastError = new Error(`Vertex AI HTTP ${resp.status}: ${errText}`);
 
-        if (status === 429 || status === 503) {
+        // Rate Limit Handling (HTTP 429) - Automatic Backoff
+        if (resp.status === 429 || resp.status === 503) {
           if (attempt < maxRetries) {
-            const totalSec = backoffSchedule[attempt] || 15;
-            
-            // Live countdown timer second-by-second so user sees exact active progress
-            for (let rem = totalSec; rem > 0; rem--) {
+            const delaySec = 20 * attempt;
+            for (let rem = delaySec; rem > 0; rem--) {
               if (signal && signal.aborted) throw new Error('Request cancelled.');
               if (onEvent) {
                 onEvent({
                   type: 'status',
                   status: 'thinking',
-                  message: `Google Cloud Rate Limit (429). Cooldown: auto-resuming Gemini 4 Argon in ${rem}s (Attempt ${attempt + 1}/${maxRetries})...`
+                  message: `Rate limit hit. Cooling down for ${rem}s before resuming Gemini 4 Argon...`
                 });
               }
               await new Promise(r => setTimeout(r, 1000));
             }
-
             if (onEvent) {
               onEvent({
                 type: 'status',
@@ -215,15 +201,11 @@ class ProviderAdapter {
   }
 
   // ==========================================================================
-  // 2. ANTHROPIC CLAUDE 5.x (OPUS 5.5 / SONNET 5.5 / FABLE 5.1 / HAIKU 5.5)
+  // 2. ANTHROPIC CLAUDE (VERTEX AI MODEL GARDEN / DIRECT ANTHROPIC)
   // ==========================================================================
   async executeClaudeTurn({ history, systemInstruction, thinkingLevel, attachments, signal, onEvent }) {
-    const apiKey = this.config.claudeApiKey || process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
-      throw new Error('Anthropic API Key is required for Claude models. Please configure it in ⚙️ Settings.');
-    }
-
     const modelId = this.getModelId() || 'claude-opus-5.5';
+    const directApiKey = this.config.claudeApiKey || process.env.ANTHROPIC_API_KEY;
 
     // Format messages for Claude Messages API
     const messages = [];
@@ -265,7 +247,11 @@ class ProviderAdapter {
       }
     }
 
-    const requestBody = {
+    let endpoint = 'https://api.anthropic.com/v1/messages';
+    let headers = {
+      'Content-Type': 'application/json'
+    };
+    let requestBody = {
       model: modelId,
       max_tokens: 8192,
       system: systemInstruction,
@@ -273,13 +259,35 @@ class ProviderAdapter {
       tools: getAnthropicTools()
     };
 
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    if (directApiKey) {
+      // Direct Anthropic API
+      headers['x-api-key'] = directApiKey;
+      headers['anthropic-version'] = '2023-06-01';
+    } else {
+      // 100% FREE via Google Cloud Vertex AI Model Garden ($300 Credits)
+      const projectId = this.config.projectId || process.env.GEMINI_PROJECT_ID;
+      if (!projectId) {
+        throw new Error('To use Claude via Google Cloud $300 Free Credits, please configure your Project ID in ⚙️ Settings (or provide an Anthropic API Key).');
+      }
+      const gcpHeaders = await getAuthHeaders(this.config);
+      headers = {
+        ...gcpHeaders,
+        'Content-Type': 'application/json; charset=utf-8'
+      };
+      const region = this.config.location && this.config.location !== 'global' ? this.config.location : 'us-east5';
+      endpoint = `https://${region}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${region}/publishers/anthropic/models/${modelId}:rawPredict`;
+      requestBody = {
+        anthropic_version: 'vertex-2023-10-16',
+        messages: messages,
+        max_tokens: 8192,
+        system: systemInstruction,
+        tools: getAnthropicTools()
+      };
+    }
+
+    const resp = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
+      headers: headers,
       body: JSON.stringify(requestBody),
       signal: signal
     });
@@ -311,91 +319,6 @@ class ProviderAdapter {
       functionCalls: functionCalls,
       rawParts: [{ text: text.trim() }],
       provider: 'claude',
-      model: modelId
-    };
-  }
-
-  // ==========================================================================
-  // 3. OPENAI GPT-6 (ASTRA / SOL / LUNA)
-  // ==========================================================================
-  async executeOpenAITurn({ history, systemInstruction, thinkingLevel, attachments, signal, onEvent }) {
-    const apiKey = this.config.openAiApiKey || process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error('OpenAI API Key is required for GPT-6 models. Please configure it in ⚙️ Settings.');
-    }
-
-    const modelId = this.getModelId() || 'gpt-6-astra';
-
-    const messages = [{ role: 'system', content: systemInstruction }];
-
-    for (const h of history) {
-      if (h.role === 'user') {
-        const content = [];
-        if (Array.isArray(h.parts)) {
-          for (const p of h.parts) {
-            if (p.text) content.push({ type: 'text', text: p.text });
-            if (p.inlineData) {
-              content.push({
-                type: 'image_url',
-                image_url: {
-                  url: `data:${p.inlineData.mimeType};base64,${p.inlineData.data}`
-                }
-              });
-            }
-          }
-        }
-        messages.push({ role: 'user', content: content.length > 0 ? content : 'Continue' });
-      } else if (h.role === 'model') {
-        const textParts = (h.parts || []).filter(p => p.text).map(p => p.text).join('\n');
-        messages.push({ role: 'assistant', content: textParts || '...' });
-      }
-    }
-
-    const requestBody = {
-      model: modelId,
-      messages: messages,
-      tools: getOpenAITools()
-    };
-
-    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify(requestBody),
-      signal: signal
-    });
-
-    if (!resp.ok) {
-      const errText = await resp.text();
-      throw new Error(`OpenAI API Error (${resp.status}): ${errText}`);
-    }
-
-    const data = await resp.json();
-    const choice = data.choices?.[0];
-    const msg = choice?.message;
-
-    const functionCalls = [];
-    if (msg?.tool_calls) {
-      for (const tc of msg.tool_calls) {
-        let parsedArgs = {};
-        try {
-          parsedArgs = JSON.parse(tc.function.arguments);
-        } catch (_) {}
-        functionCalls.push({
-          name: tc.function.name,
-          args: parsedArgs,
-          id: tc.id
-        });
-      }
-    }
-
-    return {
-      text: msg?.content || '',
-      functionCalls: functionCalls,
-      rawParts: [{ text: msg?.content || '' }],
-      provider: 'openai',
       model: modelId
     };
   }

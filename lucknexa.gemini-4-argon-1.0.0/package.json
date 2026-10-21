@@ -105,14 +105,17 @@
       "properties": {
         "gemini4Argon.provider": {
           "type": "string",
-          "enum": ["vertex", "claude", "openai"],
+          "enum": [
+            "vertex",
+            "claude"
+          ],
           "default": "vertex",
-          "description": "Primary AI Engine (Google Vertex AI, Anthropic Claude, or OpenAI)."
+          "description": "Primary AI Engine (Google Vertex AI or Anthropic Claude via Vertex Model Garden)."
         },
         "gemini4Argon.modelId": {
           "type": "string",
           "default": "gemini-4-argon",
-          "description": "Selected model tier (e.g. gemini-4-argon, claude-opus-5.5, gpt-6-astra)."
+          "description": "Selected model tier (e.g. gemini-4-argon, claude-opus-5.5, claude-opus-5, claude-opus-4.8, claude-opus-4.7, claude-sonnet-5.5, claude-haiku-5.5)."
         },
         "gemini4Argon.projectId": {
           "type": "string",
@@ -126,13 +129,21 @@
         },
         "gemini4Argon.thinkingLevel": {
           "type": "string",
-          "enum": ["low", "medium", "high"],
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
           "default": "high",
           "description": "Thinking reasoning budget level (Low: fast/eco, Medium: balanced, High: deep reasoning & full AAA coding)."
         },
         "gemini4Argon.authMethod": {
           "type": "string",
-          "enum": ["adc", "serviceAccount", "apiKey"],
+          "enum": [
+            "adc",
+            "serviceAccount",
+            "apiKey"
+          ],
           "default": "adc",
           "description": "Authentication method to access Google Cloud Vertex AI."
         },
@@ -149,12 +160,7 @@
         "gemini4Argon.claudeApiKey": {
           "type": "string",
           "default": "",
-          "description": "Anthropic API Key (for Claude Opus 5.5, Sonnet 5.5)."
-        },
-        "gemini4Argon.openAiApiKey": {
-          "type": "string",
-          "default": "",
-          "description": "OpenAI API Key (for GPT-6 Astra, Sol)."
+          "description": "Optional Anthropic API Key (leave empty to run 100% free via Vertex AI Model Garden $300 Credits)."
         }
       }
     }

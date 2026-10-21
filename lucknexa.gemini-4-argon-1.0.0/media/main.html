@@ -176,8 +176,7 @@
             <label for="cfgProvider">AI Engine</label>
             <select id="cfgProvider">
               <option value="vertex">Google Vertex AI (Gemini 4 Argon) [Default]</option>
-              <option value="claude">Anthropic Claude (Opus 5.5 / Sonnet 5.5)</option>
-              <option value="openai">OpenAI (GPT-6 Astra / Sol)</option>
+              <option value="claude">Anthropic Claude (Vertex AI Model Garden)</option>
             </select>
           </div>
 
@@ -186,13 +185,12 @@
             <label for="cfgModelId">Model Tier</label>
             <select id="cfgModelId">
               <option value="gemini-4-argon">Gemini 4 Argon (Vertex AI Flagship)</option>
-              <option value="claude-opus-5.5">Claude Opus 5.5 (Deep Reasoning Flagship)</option>
-              <option value="claude-sonnet-5.5">Claude Sonnet 5.5 (Coding Workhorse)</option>
-              <option value="claude-fable-5.1">Claude Fable 5.1 (Mythos Frontier)</option>
-              <option value="claude-haiku-5.5">Claude Haiku 5.5 (Fast & Affordable)</option>
-              <option value="gpt-6-astra">GPT-6 Astra (Flagship Software Eng)</option>
-              <option value="gpt-6.1-sol">GPT-6.1 Sol (Near-Astra Heavy Coding)</option>
-              <option value="gpt-6-luna">GPT-6 Luna (Fast Everyday)</option>
+              <option value="claude-opus-5.5">Claude Opus 5.5 (Model Garden Flagship)</option>
+              <option value="claude-opus-5">Claude Opus 5 (Model Garden Autonomous)</option>
+              <option value="claude-opus-4.8">Claude Opus 4.8 (Model Garden Deep Reasoning)</option>
+              <option value="claude-opus-4.7">Claude Opus 4.7 (Model Garden Production)</option>
+              <option value="claude-sonnet-5.5">Claude Sonnet 5.5 (Model Garden Coding Workhorse)</option>
+              <option value="claude-haiku-5.5">Claude Haiku 5.5 (Model Garden Fast Iteration)</option>
             </select>
           </div>
 
@@ -243,20 +241,13 @@
           <!-- Claude Specific Fields -->
           <div id="claudeConfigFields" style="display: none;">
             <div class="form-group">
-              <label for="cfgClaudeKey">Anthropic API Key</label>
-              <input type="password" id="cfgClaudeKey" placeholder="sk-ant-api03-..." />
-              <small class="form-hint">Enables Claude Opus 5.5 & Sonnet 5.5 directly in workspace.</small>
+              <label for="cfgClaudeKey">Anthropic API Key (Optional)</label>
+              <input type="password" id="cfgClaudeKey" placeholder="Leave blank to use Vertex $300 Free Credits, or sk-ant-..." />
+              <small class="form-hint">Tip: Leave blank to use Google Cloud $300 Free Credits on Vertex AI Model Garden!</small>
             </div>
           </div>
 
-          <!-- OpenAI Specific Fields -->
-          <div id="openAiConfigFields" style="display: none;">
-            <div class="form-group">
-              <label for="cfgOpenAiKey">OpenAI API Key</label>
-              <input type="password" id="cfgOpenAiKey" placeholder="sk-proj-..." />
-              <small class="form-hint">Enables GPT-6 Astra & Sol directly in workspace.</small>
-            </div>
-          </div>
+          
 
           <div class="test-connection-section">
             <button id="testConnBtn" type="button" class="test-glass-btn">

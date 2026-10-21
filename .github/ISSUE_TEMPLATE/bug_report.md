@@ -18,7 +18,7 @@ A clear and concise description of what the bug is.
 - **OS**: [e.g. Windows 11, macOS Sequoia, Ubuntu 24.04]
 - **Client**: [e.g. Antigravity IDE, VS Code 1.95, Claude Desktop, Cursor]
 - **Extension Version**: [e.g. 1.1.0]
-- **AI Model / Provider**: [e.g. Gemini 4 Argon, Claude Opus 5.5, GPT-6 Astra]
+- **AI Model / Provider**: [e.g. Gemini 4 Argon, Claude Opus 5.5, Claude Sonnet 5.5]
 
 ### 📸 Screenshots / Logs
 If applicable, add screenshots or terminal output to help explain the problem.

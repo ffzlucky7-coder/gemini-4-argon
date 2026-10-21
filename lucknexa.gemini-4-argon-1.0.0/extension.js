@@ -6,7 +6,7 @@
  *  - Persistent Multi-Session Chat History & Memory
  *  - Autonomous Workspace Tools & Terminal Execution
  *  - Multimodal Media & File Attachment Support (Images, Audio, PDF, Code)
- *  - Multi-Provider Adapter (Gemini 4 Argon, Claude 5.x, GPT-6)
+ *  - Multi-Provider Adapter (Gemini 4 Argon & Anthropic Claude on Vertex AI Model Garden)
  *  - Adaptive Thinking Mode (Low / Medium / High)
  *  - Universal GCP Multi-Auth (ADC, Service Account, API Key)
  */
@@ -34,8 +34,7 @@ function getExtensionConfig() {
     apiKey: cfg.get('apiKey') || '',
     provider: cfg.get('provider') || 'vertex',
     modelId: cfg.get('modelId') || 'gemini-4-argon',
-    claudeApiKey: cfg.get('claudeApiKey') || '',
-    openAiApiKey: cfg.get('openAiApiKey') || ''
+    claudeApiKey: cfg.get('claudeApiKey') || ''
   };
 }
 
@@ -76,52 +75,52 @@ async function testConnectionMulti(config) {
 
   if (provider === 'claude') {
     const key = config.claudeApiKey || process.env.ANTHROPIC_API_KEY;
-    if (!key) return { success: false, message: 'Anthropic API key required.' };
+    const modelId = config.modelId || 'claude-opus-5.5';
     const start = Date.now();
     try {
-      const resp = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': key,
-          'anthropic-version': '2023-06-01'
-        },
-        body: JSON.stringify({
-          model: config.modelId || 'claude-opus-5.5',
-          max_tokens: 10,
-          messages: [{ role: 'user', content: 'Ping' }]
-        })
-      });
-      const latency = Date.now() - start;
-      if (resp.ok) {
-        return { success: true, message: `Connected to Claude (${config.modelId || 'claude-opus-5.5'})`, latencyMs: latency };
+      if (key) {
+        const resp = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': key,
+            'anthropic-version': '2023-06-01'
+          },
+          body: JSON.stringify({
+            model: modelId,
+            max_tokens: 10,
+            messages: [{ role: 'user', content: 'Ping' }]
+          })
+        });
+        const latency = Date.now() - start;
+        if (resp.ok) {
+          return { success: true, message: `Connected to Claude (${modelId}) via Anthropic API`, latencyMs: latency };
+        }
+        return { success: false, message: `Claude API returned HTTP ${resp.status}` };
+      } else {
+        // Vertex AI Model Garden ($300 Free Credits)
+        const projectId = config.projectId || process.env.GEMINI_PROJECT_ID || autoDetectProjectId() || '';
+        if (!projectId) {
+          return { success: false, message: 'Google Cloud Project ID is required to use Claude via Model Garden Free Credits.' };
+        }
+        const headers = await getAuthHeaders(config);
+        const region = config.location && config.location !== 'global' ? config.location : 'us-east5';
+        const endpoint = `https://${region}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${region}/publishers/anthropic/models/${modelId}:rawPredict`;
+        const resp = await fetch(endpoint, {
+          method: 'POST',
+          headers: { ...headers, 'Content-Type': 'application/json; charset=utf-8' },
+          body: JSON.stringify({
+            anthropic_version: 'vertex-2023-10-16',
+            max_tokens: 10,
+            messages: [{ role: 'user', content: 'Ping' }]
+          })
+        });
+        const latency = Date.now() - start;
+        if (resp.ok) {
+          return { success: true, message: `Connected to Claude (${modelId}) via Vertex AI Model Garden (Free Credits)`, latencyMs: latency };
+        }
+        return { success: false, message: `Vertex AI Claude returned HTTP ${resp.status}` };
       }
-      return { success: false, message: `Claude API returned HTTP ${resp.status}` };
-    } catch (err) {
-      return { success: false, message: err.message };
-    }
-  } else if (provider === 'openai') {
-    const key = config.openAiApiKey || process.env.OPENAI_API_KEY;
-    if (!key) return { success: false, message: 'OpenAI API key required.' };
-    const start = Date.now();
-    try {
-      const resp = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${key}`
-        },
-        body: JSON.stringify({
-          model: config.modelId || 'gpt-6-astra',
-          max_tokens: 10,
-          messages: [{ role: 'user', content: 'Ping' }]
-        })
-      });
-      const latency = Date.now() - start;
-      if (resp.ok) {
-        return { success: true, message: `Connected to OpenAI (${config.modelId || 'gpt-6-astra'})`, latencyMs: latency };
-      }
-      return { success: false, message: `OpenAI API returned HTTP ${resp.status}` };
     } catch (err) {
       return { success: false, message: err.message };
     }
@@ -521,7 +520,6 @@ class GeminiChatViewProvider {
           if (newCfg.provider !== undefined) await vsCfg.update('provider', newCfg.provider, configTarget);
           if (newCfg.modelId !== undefined) await vsCfg.update('modelId', newCfg.modelId, configTarget);
           if (newCfg.claudeApiKey !== undefined) await vsCfg.update('claudeApiKey', newCfg.claudeApiKey, configTarget);
-          if (newCfg.openAiApiKey !== undefined) await vsCfg.update('openAiApiKey', newCfg.openAiApiKey, configTarget);
 
           currentAgent.updateConfig(getExtensionConfig());
           webview.postMessage({

@@ -1,7 +1,7 @@
 @echo off
-title Gemini 4 Argon MCP Server (ChatGPT & Remote)
+title Gemini 4 Argon MCP Server (Claude Desktop & Remote)
 echo ========================================================
-echo    Gemini 4 Argon MCP Server for ChatGPT Desktop
+echo    Gemini 4 Argon MCP Server for Claude Desktop & IDEs
 echo    Author: Lucky Kuntal (ffzlucky7-coder)
 echo ========================================================
 echo.
@@ -22,7 +22,7 @@ if %errorlevel% equ 0 (
         if %errorlevel% equ 0 (
             ngrok http 3333
         ) else (
-            echo [Notice] Please install cloudflared or ngrok to expose your local MCP server to ChatGPT Desktop.
+            echo [Notice] Please install cloudflared or ngrok to expose your local MCP server to remote clients.
             echo Local server is currently running at http://localhost:3333
             pause
         )

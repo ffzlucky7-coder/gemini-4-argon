@@ -197,7 +197,7 @@
 
 - [x] Subpixel typography anti-aliasing enabled on `body` (`optimizeLegibility`).
 - [x] Zero cheap emojis (100% SVG vector icons for all tools and controls).
-- [x] Reasoning mode taskbar docked above input bar (Cursor / ChatGPT style).
+- [x] Reasoning mode taskbar docked above input bar (Cursor / Claude style).
 - [x] Theme Toggle switch with persistent localStorage memory (Dark & Light).
 - [x] Settings dialog completely free of horizontal scrollbar bugs.
 - [x] Multi-session chat history drawer with session switching.
