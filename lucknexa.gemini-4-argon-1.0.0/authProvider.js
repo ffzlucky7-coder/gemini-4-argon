@@ -249,8 +249,31 @@ async function testConnection(config) {
   }
 }
 
+function autoDetectProjectId() {
+  if (process.env.GEMINI_PROJECT_ID && process.env.GEMINI_PROJECT_ID.trim()) {
+    return process.env.GEMINI_PROJECT_ID.trim();
+  }
+  if (process.env.GCP_PROJECT_ID && process.env.GCP_PROJECT_ID.trim()) {
+    return process.env.GCP_PROJECT_ID.trim();
+  }
+  const adcPath = getAdcFilePath();
+  if (adcPath && fs.existsSync(adcPath)) {
+    try {
+      const creds = JSON.parse(fs.readFileSync(adcPath, 'utf8'));
+      if (creds.quota_project_id && creds.quota_project_id.trim()) {
+        return creds.quota_project_id.trim();
+      }
+      if (creds.project_id && creds.project_id.trim()) {
+        return creds.project_id.trim();
+      }
+    } catch (_) {}
+  }
+  return '';
+}
+
 module.exports = {
   getAuthHeaders,
   testConnection,
-  getAdcFilePath
+  getAdcFilePath,
+  autoDetectProjectId
 };

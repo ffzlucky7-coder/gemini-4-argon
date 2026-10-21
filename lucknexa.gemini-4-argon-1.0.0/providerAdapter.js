@@ -106,7 +106,10 @@ class ProviderAdapter {
     const level = (thinkingLevel || this.config.thinkingLevel || 'high').toLowerCase();
 
     const headers = await getAuthHeaders(this.config);
-    const url = `https://aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/gemini-4-argon:generateContent`;
+    const model = 'gemini-4-argon'; // STRICT: NO FALLBACK, NO SWITCHING
+
+    const baseUrl = location === 'global' ? 'https://aiplatform.googleapis.com' : `https://${location}-aiplatform.googleapis.com`;
+    const url = `${baseUrl}/v1/projects/${projectId}/locations/${location}/publishers/google/models/${model}:generateContent`;
 
     const requestBody = {
       systemInstruction: { parts: [{ text: systemInstruction }] },
@@ -119,41 +122,96 @@ class ProviderAdapter {
       }
     };
 
-    const resp = await fetch(url, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify(requestBody),
-      signal: signal
-    });
+    // Retry schedule for Google Cloud 60s sliding quota window: 10s, 15s, 25s, 40s, 60s
+    const backoffSchedule = [10, 15, 25, 40, 60];
+    const maxRetries = backoffSchedule.length;
+    let lastError = null;
 
-    if (!resp.ok) {
-      const errJson = await resp.json().catch(() => ({}));
-      const msg = errJson.error?.message || `HTTP ${resp.status}: ${resp.statusText}`;
-      throw new Error(`Vertex AI Error (${resp.status}): ${msg}`);
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      if (signal && signal.aborted) throw new Error('Request cancelled.');
+
+      try {
+        const resp = await fetch(url, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(requestBody),
+          signal: signal
+        });
+
+        if (resp.ok) {
+          const data = await resp.json();
+          const candidate = data.candidates?.[0];
+          if (!candidate || !candidate.content || !candidate.content.parts) {
+            throw new Error('Empty response received from Gemini 4 Argon.');
+          }
+
+          const parts = candidate.content.parts;
+          const functionCalls = parts.filter(p => p.functionCall).map(p => ({
+            name: p.functionCall.name,
+            args: p.functionCall.args,
+            id: p.functionCall.id || `call_${Date.now()}`
+          }));
+
+          const textParts = parts.filter(p => p.text).map(p => p.text).join('\n');
+
+          return {
+            text: textParts,
+            functionCalls: functionCalls,
+            rawParts: parts,
+            provider: 'vertex',
+            model: 'gemini-4-argon'
+          };
+        }
+
+        const status = resp.status;
+        const errJson = await resp.json().catch(() => ({}));
+        const errMsg = errJson.error?.message || `HTTP ${status}: ${resp.statusText}`;
+        lastError = new Error(`Vertex AI Error [Gemini 4 Argon] (${status}): ${errMsg}`);
+
+        if (status === 429 || status === 503) {
+          if (attempt < maxRetries) {
+            const totalSec = backoffSchedule[attempt] || 15;
+            
+            // Live countdown timer second-by-second so user sees exact active progress
+            for (let rem = totalSec; rem > 0; rem--) {
+              if (signal && signal.aborted) throw new Error('Request cancelled.');
+              if (onEvent) {
+                onEvent({
+                  type: 'status',
+                  status: 'thinking',
+                  message: `Google Cloud Rate Limit (429). Cooldown: auto-resuming Gemini 4 Argon in ${rem}s (Attempt ${attempt + 1}/${maxRetries})...`
+                });
+              }
+              await new Promise(r => setTimeout(r, 1000));
+            }
+
+            if (onEvent) {
+              onEvent({
+                type: 'status',
+                status: 'thinking',
+                message: `Cooldown complete! Resuming Gemini 4 Argon execution...`
+              });
+            }
+            continue;
+          }
+        }
+        break;
+      } catch (fetchErr) {
+        if (signal && signal.aborted) throw fetchErr;
+        lastError = fetchErr;
+        if (attempt < maxRetries) {
+          const sec = 5;
+          for (let rem = sec; rem > 0; rem--) {
+            if (signal && signal.aborted) throw new Error('Request cancelled.');
+            await new Promise(r => setTimeout(r, 1000));
+          }
+          continue;
+        }
+        break;
+      }
     }
 
-    const data = await resp.json();
-    const candidate = data.candidates?.[0];
-    if (!candidate || !candidate.content || !candidate.content.parts) {
-      throw new Error('Empty response received from Gemini 4 Argon.');
-    }
-
-    const parts = candidate.content.parts;
-    const functionCalls = parts.filter(p => p.functionCall).map(p => ({
-      name: p.functionCall.name,
-      args: p.functionCall.args,
-      id: p.functionCall.id || `call_${Date.now()}`
-    }));
-
-    const textParts = parts.filter(p => p.text).map(p => p.text).join('\n');
-
-    return {
-      text: textParts,
-      functionCalls: functionCalls,
-      rawParts: parts,
-      provider: 'vertex',
-      model: 'gemini-4-argon'
-    };
+    throw lastError || new Error('Failed to get response from Gemini 4 Argon on Vertex AI.');
   }
 
   // ==========================================================================

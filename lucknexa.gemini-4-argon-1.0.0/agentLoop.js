@@ -15,19 +15,18 @@
 const { executeTool } = require('./tools');
 const { ProviderAdapter } = require('./providerAdapter');
 
-const SYSTEM_INSTRUCTION = `You are Gemini 4 Argon, Google's flagship reasoning AI model, operating as an autonomous software engineer and architect inside the Antigravity IDE.
+const SYSTEM_INSTRUCTION = `You are Gemini 4 Argon, Google's flagship reasoning AI model, operating as an autonomous principal software engineer and architect inside the Antigravity IDE.
 You have FULL autonomous access to the user's workspace:
 - You can inspect files (read_file), search the codebase (search_code), and explore directories (list_dir, get_workspace_structure).
 - You can edit existing code (edit_file) and create new files (write_file). Backups are created automatically (.argon_bak).
 - You can run terminal commands (run_command) such as running test suites (pytest, npm test), linters, git commands, and builds.
-- You are natively multimodal: you can inspect attached screenshots, UI mockups, diagrams, documents, and data files.
 
-GUIDELINES:
-1. Always investigate the codebase first using your tools before jumping to conclusions.
-2. When asked to audit or debug, read the relevant files, search for usages, run tests if appropriate, and identify exact root causes.
-3. When writing or editing code, write clean, production-grade, bug-free implementations.
-4. When presenting information about the project or files, provide clear, structured, readable Markdown with concise headings and bullet points. Never display raw shell commands or internal tool noise; present the clean, direct synthesis and findings to the user.
-5. Keep the user informed with clear, structured explanations of what you found and what changes you made.`;
+ELITE ENGINEERING & FAST-TRACK RULES:
+1. DECISIVE & FAST EXECUTION: Never spend more than 1 or 2 turns reading files. Within 2 turns, you MUST proceed to write/edit the code. Never loop repeatedly on read_file.
+2. FULL ADVANCED IMPLEMENTATION: Write high-quality, production-grade, complete code. Never leave placeholders or "// TODO" comments.
+3. COMMUNICATE EVERY STEP: Always write a concise explanation of what you are analyzing and refactoring in your text alongside tool calls so the user sees live progress in chat.
+4. BATCH TOOL CALLS: When refactoring multiple files, invoke all tool calls simultaneously in the same turn. Do not edit 1 file per turn.
+5. ALWAYS DELIVER SAVED FILES: When writing or editing, use write_file or edit_file directly so files are saved to the workspace.`;
 
 class GeminiAgent {
   constructor(workspaceRoot, config) {
@@ -142,14 +141,18 @@ class GeminiAgent {
 
       const functionCalls = turnResult.functionCalls || [];
 
-      // If no function calls, the model produced its final response
-      if (functionCalls.length === 0) {
+      // Stream model's explanation to chat immediately so user never sits in silence
+      if (turnResult.text && turnResult.text.trim().length > 0) {
         onEvent({
           type: 'text',
           content: turnResult.text,
           model: turnResult.model,
           provider: turnResult.provider
         });
+      }
+
+      // If no function calls, the model has completed all actions
+      if (functionCalls.length === 0) {
         onEvent({ type: 'status', status: 'idle', message: 'Ready' });
         return;
       }
@@ -162,11 +165,13 @@ class GeminiAgent {
 
         const callId = call.id || `call_${Date.now()}`;
 
+        const targetName = call.args?.path ? call.args.path.split(/[\\/]/).pop() : (call.args?.command ? call.args.command.slice(0, 30) : '');
         onEvent({
           type: 'tool_start',
           tool: call.name,
           args: call.args,
-          id: callId
+          id: callId,
+          target: targetName
         });
 
         let toolResult;
@@ -211,6 +216,9 @@ class GeminiAgent {
         role: 'user',
         parts: responseParts
       });
+
+      // Pacing delay to avoid burst RPM rate-limits on Vertex AI
+      await new Promise(r => setTimeout(r, 2000));
     }
 
     onEvent({

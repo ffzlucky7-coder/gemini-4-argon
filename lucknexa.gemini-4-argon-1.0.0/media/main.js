@@ -812,13 +812,23 @@
       const cleanCode = code.replace(/\n$/, '');
 
       const html = `
-        <div class="code-block-container">
+        <div class="code-block-container" data-language="${escapeHtml(language)}">
           <div class="code-header">
-            <span class="code-lang">${escapeHtml(language)}</span>
-            <button class="copy-code-btn" type="button" aria-label="Copy code block">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              <span>Copy</span>
-            </button>
+            <span class="code-lang">📄 ${escapeHtml(language)}</span>
+            <div class="code-header-actions">
+              <button class="code-action-btn open-code-btn" type="button" title="Open in Editor">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                <span>Open</span>
+              </button>
+              <button class="code-action-btn download-code-btn" type="button" title="Download File">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Download</span>
+              </button>
+              <button class="copy-code-btn" type="button" aria-label="Copy code block">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                <span>Copy</span>
+              </button>
+            </div>
           </div>
           <pre><code class="language-${escapeHtml(language)}">${escapeHtml(cleanCode)}</code></pre>
         </div>
@@ -861,29 +871,146 @@
     return formatted;
   }
 
+
+  const LANG_EXT_MAP = {
+    python: '.py', py: '.py',
+    javascript: '.js', js: '.js', jsx: '.jsx',
+    typescript: '.ts', ts: '.ts', tsx: '.tsx',
+    html: '.html', css: '.css', json: '.json',
+    markdown: '.md', md: '.md',
+    bash: '.sh', sh: '.sh', shell: '.sh',
+    powershell: '.ps1', ps1: '.ps1',
+    sql: '.sql', yaml: '.yaml', yml: '.yml',
+    rust: '.rs', rs: '.rs',
+    go: '.go', c: '.c', cpp: '.cpp',
+    java: '.java', kotlin: '.kt',
+    xml: '.xml', svg: '.svg'
+  };
+
+  function downloadBrowserBlob(data, fileName) {
+    try {
+      const blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (e) {
+      console.warn('Browser blob download failed:', e);
+    }
+  }
+
+  function appendFileArtifactCard(result) {
+    if (!chatContainer || !result) return;
+    const card = document.createElement('div');
+    card.className = 'file-artifact-card';
+    const filePath = result.path || 'file.txt';
+    const fileName = filePath.split(/[\\/]/).pop();
+    const bytes = result.bytesWritten || 0;
+    const sizeStr = bytes > 1024 ? (bytes / 1024).toFixed(1) + ' KB' : bytes + ' B';
+
+    card.innerHTML = `
+      <div class="artifact-card-inner">
+        <div class="artifact-card-left">
+          <div class="artifact-card-icon">📄</div>
+          <div class="artifact-card-meta">
+            <span class="artifact-card-filename">${escapeHtml(fileName)}</span>
+            <span class="artifact-card-path">${escapeHtml(filePath)} • ${sizeStr}</span>
+          </div>
+        </div>
+        <div class="artifact-card-buttons">
+          <button class="artifact-btn open-file-btn" type="button" title="Open in Editor">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span>Open in Editor</span>
+          </button>
+          <button class="artifact-btn download-file-btn" type="button" title="Download File">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Download</span>
+          </button>
+        </div>
+      </div>
+    `;
+
+    const openBtn = card.querySelector('.open-file-btn');
+    if (openBtn) {
+      openBtn.addEventListener('click', () => {
+        vscode.postMessage({ type: 'openFile', path: filePath });
+      });
+    }
+
+    const downloadBtn = card.querySelector('.download-file-btn');
+    if (downloadBtn) {
+      downloadBtn.addEventListener('click', () => {
+        vscode.postMessage({ type: 'downloadWorkspaceFile', path: filePath });
+      });
+    }
+
+    chatContainer.appendChild(card);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+
   function attachCodeCopyListeners(container) {
+    // 1. Copy Buttons
     const copyBtns = container.querySelectorAll('.copy-code-btn');
     copyBtns.forEach((btn) => {
       btn.addEventListener('click', () => {
         const pre = btn.closest('.code-block-container').querySelector('pre code');
         if (!pre) return;
-
         const textToCopy = pre.textContent;
         navigator.clipboard.writeText(textToCopy).then(() => {
           btn.classList.add('copied');
           btn.innerHTML = `
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
             <span>Copied!</span>
           `;
           setTimeout(() => {
             btn.classList.remove('copied');
             btn.innerHTML = `
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
               <span>Copy</span>
             `;
           }, 2000);
-        }).catch((err) => {
-          console.error('Failed to copy code: ', err);
+        });
+      });
+    });
+
+    // 2. Open in Editor Buttons
+    const openBtns = container.querySelectorAll('.open-code-btn');
+    openBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const wrap = btn.closest('.code-block-container');
+        const pre = wrap ? wrap.querySelector('pre code') : null;
+        if (!pre) return;
+        const lang = wrap.getAttribute('data-language') || 'plaintext';
+        vscode.postMessage({
+          type: 'openNewDocument',
+          content: pre.textContent,
+          language: lang
+        });
+      });
+    });
+
+    // 3. Download File Buttons
+    const dlBtns = container.querySelectorAll('.download-code-btn');
+    dlBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const wrap = btn.closest('.code-block-container');
+        const pre = wrap ? wrap.querySelector('pre code') : null;
+        if (!pre) return;
+        const lang = (wrap.getAttribute('data-language') || 'file').toLowerCase();
+        const ext = LANG_EXT_MAP[lang] || '.txt';
+        const fileName = (lang !== 'file' && lang !== 'code' ? lang : 'script') + ext;
+        const codeText = pre.textContent;
+
+        // Trigger both browser blob download and VS Code save dialog
+        downloadBrowserBlob(codeText, fileName);
+        vscode.postMessage({
+          type: 'downloadFile',
+          content: codeText,
+          fileName: fileName
         });
       });
     });
@@ -1000,6 +1127,9 @@
 
       case 'tool_end': {
         updateToolPill(msg.id, msg.success, msg.tool);
+        if (msg.tool === 'write_file' && msg.success && msg.result) {
+          appendFileArtifactCard(msg.result);
+        }
         break;
       }
 
@@ -1062,5 +1192,10 @@
       }
     }
   });
+
+  // Request initial state on script load
+  try {
+    vscode.postMessage({ type: 'getInitialState' });
+  } catch (_) {}
 
 })();

@@ -140,40 +140,82 @@ const MCP_TOOLS = [
   }
 ];
 
-// Execute Gemini 4 Argon Direct Query
+function getAutoProjectId() {
+  if (config.projectId && config.projectId.trim()) return config.projectId.trim();
+  if (process.env.GEMINI_PROJECT_ID) return process.env.GEMINI_PROJECT_ID.trim();
+  if (process.env.GCP_PROJECT_ID) return process.env.GCP_PROJECT_ID.trim();
+  try {
+    const appData = process.env.APPDATA || path.join(process.env.USERPROFILE || '', 'AppData', 'Roaming');
+    const adcPath = path.join(appData, 'gcloud', 'application_default_credentials.json');
+    if (fs.existsSync(adcPath)) {
+      const c = JSON.parse(fs.readFileSync(adcPath, 'utf8'));
+      if (c.quota_project_id) return c.quota_project_id.trim();
+    }
+  } catch (_) {}
+  return '';
+}
+
+// Execute Gemini 4 Argon Direct Query with Resilient Auto-Failover
 async function callGemini4Argon(prompt, thinkingLevel = 'high') {
-  if (!config.projectId) {
+  const projectId = getAutoProjectId();
+  if (!projectId) {
     throw new Error('GEMINI_PROJECT_ID is not configured. Please set GEMINI_PROJECT_ID in your MCP client environment settings.');
   }
 
   const headers = await getAuthHeaders(config);
-  const url = `https://aiplatform.googleapis.com/v1/projects/${config.projectId}/locations/${config.location}/publishers/google/models/gemini-4-argon:generateContent`;
+  const location = config.location || 'global';
+  const model = 'gemini-4-argon'; // STRICT: NO FALLBACK, NO SWITCHING
+  const baseUrl = location === 'global' ? 'https://aiplatform.googleapis.com' : `https://${location}-aiplatform.googleapis.com`;
+  const url = `${baseUrl}/v1/projects/${projectId}/locations/${location}/publishers/google/models/${model}:generateContent`;
 
-  const requestBody = {
+  const body = {
     contents: [{ role: 'user', parts: [{ text: prompt }] }],
     generationConfig: {
       temperature: 0.2,
       maxOutputTokens: 8192,
-      thinkingConfig: {
-        thinkingLevel: thinkingLevel.toLowerCase()
-      }
+      thinkingConfig: { thinkingLevel: thinkingLevel || 'high' }
     }
   };
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify(requestBody)
-  });
+  const maxRetries = 4;
+  let lastError = null;
 
-  if (!response.ok) {
-    const errText = await response.text();
-    throw new Error(`Vertex AI error (${response.status}): ${errText}`);
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(body)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).filter(Boolean).join('\n') || '';
+        if (text) return text;
+      } else {
+        const errText = await response.text();
+        lastError = new Error(`Vertex AI error [Gemini 4 Argon] (${response.status}): ${errText}`);
+        if (response.status === 429 || response.status === 503) {
+          if (attempt < maxRetries) {
+            const backoffSec = (attempt + 1) * 3;
+            process.stderr.write(`[Gemini 4 Argon MCP] 429 rate limit. Waiting ${backoffSec}s to retry Gemini 4 Argon exclusively...\n`);
+            await new Promise(r => setTimeout(r, backoffSec * 1000));
+            continue;
+          }
+        }
+        break;
+      }
+    } catch (err) {
+      lastError = err;
+      if (attempt < maxRetries) {
+        await new Promise(r => setTimeout(r, 3000));
+        continue;
+      }
+      break;
+    }
   }
 
-  const data = await response.json();
-  const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).filter(Boolean).join('\n') || '';
-  return text;
+  throw lastError || new Error('Failed to generate response from Gemini on Vertex AI.');
 }
 
 // Handle JSON-RPC Message Dispatch
@@ -192,12 +234,152 @@ async function handleMessage(request) {
             version: SERVER_VERSION
           },
           capabilities: {
-            tools: {
-              listChanged: false
-            }
+            tools: { listChanged: false },
+            resources: { subscribe: false, listChanged: false },
+            prompts: { listChanged: false }
           }
         }
       };
+
+    case 'resources/list':
+      return {
+        jsonrpc: '2.0',
+        id,
+        result: {
+          resources: [
+            {
+              uri: 'gemini://workspace/overview',
+              name: 'Workspace Architecture Overview',
+              description: 'Summary of the current workspace directory, active git branch, and project files.',
+              mimeType: 'text/markdown'
+            },
+            {
+              uri: 'gemini://models/status',
+              name: 'Vertex AI Model Status & Quotas',
+              description: 'Live configuration status of Google Vertex AI endpoint, project ID, and model tiers.',
+              mimeType: 'application/json'
+            }
+          ]
+        }
+      };
+
+    case 'resources/read': {
+      const uri = params?.uri;
+      if (uri === 'gemini://models/status') {
+        const projectId = getAutoProjectId();
+        return {
+          jsonrpc: '2.0',
+          id,
+          result: {
+            contents: [
+              {
+                uri,
+                mimeType: 'application/json',
+                text: JSON.stringify({
+                  server: SERVER_NAME,
+                  version: SERVER_VERSION,
+                  projectId: projectId || 'Not configured',
+                  location: config.location || 'global',
+                  authMethod: config.authMethod || 'adc',
+                  defaultModel: 'gemini-4-argon',
+                  failoverTiers: ['gemini-2.5-pro', 'gemini-2.5-flash']
+                }, null, 2)
+              }
+            ]
+          }
+        };
+      } else if (uri === 'gemini://workspace/overview') {
+        const targetWorkspace = params?.workspaceRoot || WORKSPACE_ROOT;
+        const toolResult = await executeTool('get_workspace_structure', { max_depth: 3 }, targetWorkspace);
+        return {
+          jsonrpc: '2.0',
+          id,
+          result: {
+            contents: [
+              {
+                uri,
+                mimeType: 'text/markdown',
+                text: `# Workspace Overview: ${path.basename(targetWorkspace)}\n\nRoot: \`${targetWorkspace}\`\n\n\`\`\`\n${typeof toolResult === 'string' ? toolResult : JSON.stringify(toolResult, null, 2)}\n\`\`\``
+              }
+            ]
+          }
+        };
+      }
+      return {
+        jsonrpc: '2.0',
+        id,
+        error: { code: -32602, message: `Resource not found: ${uri}` }
+      };
+    }
+
+    case 'prompts/list':
+      return {
+        jsonrpc: '2.0',
+        id,
+        result: {
+          prompts: [
+            {
+              name: 'gemini_architectural_design',
+              description: 'Formulate an enterprise-grade architectural design for a new feature or system refactor using Gemini 4 Argon deep reasoning.',
+              arguments: [
+                { name: 'requirements', description: 'Detailed feature requirements and technical constraints.', required: true }
+              ]
+            },
+            {
+              name: 'gemini_deep_debug',
+              description: 'Perform hypothesis-driven root cause debugging for a failing component or test.',
+              arguments: [
+                { name: 'errorDetails', description: 'Error stack trace, failing test output, or unexpected behavior.', required: true }
+              ]
+            }
+          ]
+        }
+      };
+
+    case 'prompts/get': {
+      const promptName = params?.name;
+      const args = params?.arguments || {};
+      if (promptName === 'gemini_architectural_design') {
+        return {
+          jsonrpc: '2.0',
+          id,
+          result: {
+            description: 'Architectural Design Prompt',
+            messages: [
+              {
+                role: 'user',
+                content: {
+                  type: 'text',
+                  text: `You are Gemini 4 Argon, a frontier software architect. Produce a comprehensive, enterprise-ready system architecture design for the following requirements:\n\n${args.requirements || 'System Architecture Request'}\n\nInclude: Component Boundaries, Data Flow, Sequence/ER Mermaid Diagrams, Security/Auth model, and File Structure.`
+                }
+              }
+            ]
+          }
+        };
+      } else if (promptName === 'gemini_deep_debug') {
+        return {
+          jsonrpc: '2.0',
+          id,
+          result: {
+            description: 'Root Cause Debugging Prompt',
+            messages: [
+              {
+                role: 'user',
+                content: {
+                  type: 'text',
+                  text: `You are Gemini 4 Argon. Conduct a rigorous, hypothesis-driven debugging investigation for this issue:\n\n${args.errorDetails || 'Bug Description'}\n\nIsolate the exact failing line, explain the root-cause mechanics, and provide a surgical, drop-in code fix with regression prevention tests.`
+                }
+              }
+            ]
+          }
+        };
+      }
+      return {
+        jsonrpc: '2.0',
+        id,
+        error: { code: -32602, message: `Prompt not found: ${promptName}` }
+      };
+    }
 
     case 'notifications/initialized':
       return null; // Notifications expect no response
@@ -327,4 +509,14 @@ function start() {
   });
 }
 
-start();
+if (require.main === module) {
+  start();
+}
+
+module.exports = {
+  handleMessage,
+  MCP_TOOLS,
+  SERVER_VERSION,
+  callGemini4Argon
+};
+

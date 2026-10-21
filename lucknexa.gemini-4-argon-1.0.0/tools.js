@@ -101,7 +101,7 @@ async function writeFileTool(args, workspaceRoot) {
   };
 }
 
-// 3. edit_file
+// 3. edit_file (Resilient CRLF/LF & Whitespace Normalized Matching)
 async function editFileTool(args, workspaceRoot) {
   const filePath = resolveWorkspacePath(args.path, workspaceRoot);
   if (!fs.existsSync(filePath)) {
@@ -116,19 +116,41 @@ async function editFileTool(args, workspaceRoot) {
   }
 
   const originalContent = fs.readFileSync(filePath, 'utf8');
+  const hasCRLF = originalContent.includes('\r\n');
 
-  if (!originalContent.includes(target)) {
-    // Provide diagnostic hints
-    const snippet = originalContent.slice(0, 500);
-    throw new Error(`Target text not found in ${args.path}.\nTarget was:\n${target}\n\nFirst 500 characters of file:\n${snippet}`);
+  let updatedContent = null;
+
+  // 1. Exact string match
+  if (originalContent.includes(target)) {
+    updatedContent = originalContent.replaceAll(target, replacement);
+  } else {
+    // 2. CRLF vs LF Normalized match
+    const normOriginal = originalContent.replace(/\r\n/g, '\n');
+    const normTarget = target.replace(/\r\n/g, '\n');
+    const normReplacement = replacement.replace(/\r\n/g, '\n');
+
+    if (normOriginal.includes(normTarget)) {
+      const replacedNorm = normOriginal.replaceAll(normTarget, normReplacement);
+      updatedContent = hasCRLF ? replacedNorm.replace(/\n/g, '\r\n') : replacedNorm;
+    } else {
+      // 3. Trimmed block match (ignoring boundary whitespace differences)
+      const trimTarget = normTarget.trim();
+      if (trimTarget.length > 0 && normOriginal.includes(trimTarget)) {
+        const replacedNorm = normOriginal.replace(trimTarget, normReplacement.trim());
+        updatedContent = hasCRLF ? replacedNorm.replace(/\n/g, '\r\n') : replacedNorm;
+      }
+    }
   }
 
-  // Backup
+  if (updatedContent === null) {
+    const snippet = originalContent.slice(0, 300);
+    throw new Error(`Target text not found in ${args.path}. (Preview of file: ${snippet}...)`);
+  }
+
+  // Backup original file
   const backupPath = `${filePath}.argon_bak`;
   fs.copyFileSync(filePath, backupPath);
 
-  // Replace all occurrences or first occurrence
-  const updatedContent = originalContent.replaceAll(target, replacement);
   fs.writeFileSync(filePath, updatedContent, 'utf8');
 
   return {

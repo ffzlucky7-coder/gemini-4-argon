@@ -15,7 +15,7 @@ const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs');
 const { GeminiAgent } = require('./agentLoop');
-const { getAdcFilePath, getAuthHeaders } = require('./authProvider');
+const { getAdcFilePath, getAuthHeaders, autoDetectProjectId } = require('./authProvider');
 
 const SESSIONS_STORAGE_KEY = 'gemini4argon_sessions_store_v1';
 const CURRENT_SESSION_ID_KEY = 'gemini4argon_active_session_id';
@@ -24,8 +24,9 @@ let currentAgent = null;
 
 function getExtensionConfig() {
   const cfg = vscode.workspace.getConfiguration('gemini4Argon');
+  const detectedProj = autoDetectProjectId();
   return {
-    projectId: cfg.get('projectId') || process.env.GEMINI_PROJECT_ID || '',
+    projectId: cfg.get('projectId') || detectedProj || '',
     location: cfg.get('location') || 'global',
     thinkingLevel: cfg.get('thinkingLevel') || 'high',
     authMethod: cfg.get('authMethod') || 'adc',
@@ -129,26 +130,36 @@ async function testConnectionMulti(config) {
     const startTime = Date.now();
     try {
       const headers = await getAuthHeaders(config);
-      const projectId = config.projectId || process.env.GEMINI_PROJECT_ID || '';
-    if (!projectId) {
-      return { success: false, message: 'Google Cloud Project ID is not configured. Please enter your Project ID in Settings (⚙️).' };
-    }
-      const location = config.location || 'global';
-      const url = `https://aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/gemini-4-argon:generateContent`;
-      const resp = await fetch(url, {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify({
-          contents: [{ role: 'user', parts: [{ text: 'Respond with OK' }] }],
-          generationConfig: { maxOutputTokens: 10, thinkingConfig: { thinkingLevel: 'low' } }
-        })
-      });
-      const latency = Date.now() - startTime;
-      if (resp.ok) {
-        return { success: true, message: 'Successfully connected to Gemini 4 Argon!', latencyMs: latency };
+      const projectId = config.projectId || process.env.GEMINI_PROJECT_ID || autoDetectProjectId() || '';
+      if (!projectId) {
+        return { success: false, message: 'Google Cloud Project ID is not configured. Please enter your Project ID in Settings (⚙️).' };
       }
-      const err = await resp.text();
-      return { success: false, message: `Vertex AI error: ${err}` };
+      const location = config.location || 'global';
+      const modelsToTry = ['gemini-4-argon', 'gemini-2.5-pro', 'gemini-2.5-flash'];
+      let lastErr = '';
+
+      for (const model of modelsToTry) {
+        const baseUrl = location === 'global' ? 'https://aiplatform.googleapis.com' : `https://${location}-aiplatform.googleapis.com`;
+        const url = `${baseUrl}/v1/projects/${projectId}/locations/${location}/publishers/google/models/${model}:generateContent`;
+        try {
+          const resp = await fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({
+              contents: [{ role: 'user', parts: [{ text: 'Respond with OK' }] }],
+              generationConfig: { maxOutputTokens: 10 }
+            })
+          });
+          const latency = Date.now() - startTime;
+          if (resp.ok) {
+            return { success: true, message: `Successfully connected to ${model} on Vertex AI!`, latencyMs: latency };
+          }
+          lastErr = await resp.text();
+        } catch (e) {
+          lastErr = e.message;
+        }
+      }
+      return { success: false, message: `Vertex AI error: ${lastErr}` };
     } catch (err) {
       return { success: false, message: err.message };
     }
@@ -405,6 +416,78 @@ class GeminiChatViewProvider {
         case 'openExternalUrl': {
           if (message.url) {
             vscode.env.openExternal(vscode.Uri.parse(message.url));
+          }
+          break;
+        }
+
+        case 'openFile': {
+          const targetPath = message.path;
+          if (!targetPath) break;
+          const absPath = path.isAbsolute(targetPath) ? targetPath : path.join(workspaceRoot, targetPath);
+          try {
+            if (fs.existsSync(absPath)) {
+              const doc = await vscode.workspace.openTextDocument(absPath);
+              await vscode.window.showTextDocument(doc);
+            } else {
+              vscode.window.showWarningMessage('File not found: ' + absPath);
+            }
+          } catch (e) {
+            vscode.window.showErrorMessage('Could not open file: ' + e.message);
+          }
+          break;
+        }
+
+        case 'openNewDocument': {
+          const content = message.content || '';
+          const language = message.language || 'plaintext';
+          try {
+            const doc = await vscode.workspace.openTextDocument({ content, language });
+            await vscode.window.showTextDocument(doc);
+          } catch (e) {
+            vscode.window.showErrorMessage('Could not open editor tab: ' + e.message);
+          }
+          break;
+        }
+
+        case 'downloadFile': {
+          const defaultName = message.fileName || 'file.txt';
+          const content = message.content || '';
+          try {
+            const defaultUri = vscode.Uri.file(path.join(workspaceRoot, defaultName));
+            const saveUri = await vscode.window.showSaveDialog({
+              defaultUri,
+              saveLabel: 'Save File'
+            });
+            if (saveUri) {
+              fs.writeFileSync(saveUri.fsPath, content, 'utf8');
+              vscode.window.showInformationMessage('Saved successfully!');
+            }
+          } catch (e) {
+            vscode.window.showErrorMessage('Save failed: ' + e.message);
+          }
+          break;
+        }
+
+        case 'downloadWorkspaceFile': {
+          const targetPath = message.path;
+          if (!targetPath) break;
+          const absPath = path.isAbsolute(targetPath) ? targetPath : path.join(workspaceRoot, targetPath);
+          try {
+            if (fs.existsSync(absPath)) {
+              const content = fs.readFileSync(absPath, 'utf8');
+              const saveUri = await vscode.window.showSaveDialog({
+                defaultUri: vscode.Uri.file(path.join(workspaceRoot, path.basename(absPath))),
+                saveLabel: 'Download File As'
+              });
+              if (saveUri) {
+                fs.writeFileSync(saveUri.fsPath, content, 'utf8');
+                vscode.window.showInformationMessage('Downloaded successfully!');
+              }
+            } else {
+              vscode.window.showWarningMessage('File not found: ' + absPath);
+            }
+          } catch (e) {
+            vscode.window.showErrorMessage('Download failed: ' + e.message);
           }
           break;
         }
